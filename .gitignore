@@ -1,0 +1,10 @@
+dist
+package-lock.json
+node_modules
+.idea
+.vscode
+*.log
+.env*
+*.env*
+prisma/seed.graphql
+src/__tests__/mocks.ts

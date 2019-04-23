@@ -1,0 +1,40 @@
+{
+  "name": "mullgan_api_v1",
+  "version": "1.0.0",
+  "description": "Backend GraphQL API for the Mulligan application",
+  "main": "index.js",
+  "scripts": {
+    "start": "dotenv -- nodemon -e ts,graphql -x ts-node src/index.ts",
+    "debug": "dotenv -- nodemon -e ts,graphql -x ts-node --inspect src/index.ts",
+    "build": "rimraf dist && tsc",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  },
+  "author": "Austin Howlett",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "graphql-tools": "^4.0.4",
+    "graphql-yoga": "^1.17.4",
+    "jsonwebtoken": "^8.5.1",
+    "ora": "^3.4.0",
+    "prisma-client-lib": "^1.31.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jest": "^24.0.11",
+    "@types/node": "^11.13.7",
+    "dotenv-cli": "^2.0.0",
+    "jest": "^24.7.1",
+    "nodemon": "^1.18.11",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
+  },
+  "resolutions": {
+    "graphql": "^14.2.0"
+  }
+}

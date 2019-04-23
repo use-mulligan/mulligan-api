@@ -1,0 +1,71 @@
+type Account {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  email: String! @unique
+  password: String!
+  profile: Profile! @relation(link: INLINE)
+  role: Role!
+}
+
+type Profile {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  firstName: String!
+  lastName: String!
+  account: Account!
+  scoreCards: [Scorecard!]!
+}
+
+type Course {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  scoreCard: Scorecard!
+  courseName: String!
+  courseAddress: String!
+  coursePhone: String!
+  long: Float!
+  lat: Float!
+  numberOfHoles: Int!
+  holes: [Hole!]!
+}
+
+type Hole {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  course: Course! @relation(link: INLINE)
+  holeNum: Int!
+  handicap: Int!
+  par: Int!
+  distanceToFlag: Float!
+  blueTee: Int!
+  whiteTee: Int!
+  redTee: Int!
+  scores: [Stroke]!
+}
+
+type Scorecard {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  profile: Profile! @relation(link: INLINE)
+  golfers: [String!]! @scalarList(strategy: RELATION)
+  course: Course! @relation(link: INLINE)
+}
+
+type Stroke {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  hole: Hole! @relation(link: INLINE)
+  golfer: String!
+  strokes: Int!
+}
+
+enum Role {
+  USER
+  ADMIN
+}

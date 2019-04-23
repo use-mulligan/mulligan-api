@@ -1,0 +1,99 @@
+# Query - Mutation - Subscription
+
+type Query {
+  me: Account!
+  account(id: ID!): Account!
+  accounts: [Account!]!
+}
+
+type Mutation {
+  signup(
+    email: String!
+    password: String!
+    firstName: String!
+    lastName: String!
+  ): AuthPayload!
+  login(email: String!, password: String!): AuthPayload!
+  createAccount(email: String!, password: String!, role: Role!): Account!
+  deleteAccount(id: ID!): Account!
+}
+
+# Types
+
+type AuthPayload {
+  token: String!
+  account: Account!
+}
+
+type Account {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  email: String!
+  profile: Profile!
+  role: Role!
+}
+
+type Profile {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  firstName: String!
+  lastName: String!
+  account: Account!
+  scoreCards: [Scorecard!]!
+}
+
+type Course {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  scoreCard: Scorecard!
+  courseName: String!
+  courseAddress: String!
+  coursePhone: String!
+  long: Float!
+  lat: Float!
+  numberOfHoles: Int!
+  holes: [Hole!]!
+}
+
+type Hole {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: Course!
+  holeNum: Int!
+  handicap: Int!
+  par: Int!
+  distanceToFlag: Float!
+  blueTee: Int!
+  whiteTee: Int!
+  redTee: Int!
+  scores: [Stroke]!
+}
+
+type Scorecard {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  profile: Profile!
+  golfers: [String!]!
+  course: Course!
+}
+
+type Stroke {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  hole: Hole!
+  golfer: String!
+  strokes: Int!
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+scalar DateTime
