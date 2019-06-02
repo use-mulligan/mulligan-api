@@ -4,7 +4,7 @@ type Account {
   updatedAt: DateTime! @updatedAt
   email: String! @unique
   password: String!
-  profile: Profile! @relation(link: INLINE)
+  profile: Profile! @relation(name: "UsersProfile", onDelete: CASCADE)
   role: Role!
 }
 
@@ -14,7 +14,8 @@ type Profile {
   updatedAt: DateTime! @updatedAt
   firstName: String!
   lastName: String!
-  account: Account!
+  fullName: String!
+  account: Account! @relation(name: "UsersProfile", link: INLINE)
   scoreCards: [Scorecard!]!
 }
 
@@ -41,10 +42,9 @@ type Hole {
   handicap: Int!
   par: Int!
   distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
-  scores: [Stroke]!
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
 }
 
 type Scorecard {
@@ -52,17 +52,28 @@ type Scorecard {
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
   profile: Profile! @relation(link: INLINE)
-  golfers: [String!]! @scalarList(strategy: RELATION)
+  golfers: [Golfer!]!
   course: Course! @relation(link: INLINE)
+  strokes: [Stroke]!
 }
 
 type Stroke {
   id: ID! @id
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
+  golferId: ID
+  profileId: ID
   hole: Hole! @relation(link: INLINE)
-  golfer: String!
+  scoreCard: Scorecard @relation(link: INLINE)
   strokes: Int!
+}
+
+type Golfer {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  name: String!
+  scoreCard: Scorecard @relation(link: INLINE)
 }
 
 enum Role {
