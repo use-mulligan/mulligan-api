@@ -30,7 +30,7 @@ type Account {
   createdAt: DateTime!
   updatedAt: DateTime!
   email: String!
-  profile: Profile!
+  profile: Profile
   role: Role!
 }
 
@@ -40,6 +40,7 @@ type Profile {
   updatedAt: DateTime!
   firstName: String!
   lastName: String!
+  fullName: String!
   account: Account!
   scoreCards: [Scorecard!]!
 }
@@ -89,6 +90,14 @@ type Stroke {
   hole: Hole!
   golfer: String!
   strokes: Int!
+}
+
+type Golfer {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  name: String!
+  scoreCard: Scorecard
 }
 
 enum Role {
