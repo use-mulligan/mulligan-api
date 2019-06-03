@@ -13,11 +13,12 @@ export const Auth = {
    * @param accountname => type: String
    * @param ctx - request context allows access to http headers
    */
-  async signup(parent, { email, password, firstName, lastName }, ctx: Context) {
+  async signup(_, { email, password, firstName, lastName }, ctx: Context) {
     try {
       // make sure account doesn't exist before attempting
       // to create a new account
       const accountExists = await ctx.prisma.$exists.account({ email: email });
+
       if (accountExists) {
         throw new UniqueConstraintViolationError();
       }
@@ -27,11 +28,12 @@ export const Auth = {
       const account = await ctx.prisma.createAccount({
         email: email,
         password: password,
-        role: "USER",
+        role: "ADMIN",
         profile: {
           create: {
             firstName: firstName,
-            lastName: lastName
+            lastName: lastName,
+            fullName: firstName + " " + lastName
           }
         }
       });
@@ -54,18 +56,21 @@ export const Auth = {
    * @param password => String
    * @param ctx - request context allows access to http headers
    */
-  async login(parent, { email, password }, ctx: Context) {
+  async login(_, { email, password }, ctx: Context) {
     try {
       // make sure the account exists first
       const account = await ctx.prisma.account({ email: email });
       if (!account) {
-        throw new Error(`No such account found for email: ${email}`);
+        throw new Error(
+          `Cannot find account associated with the email: ${email}`
+        );
       }
 
       // then validate their credentials
       const valid = await bcrypt.compare(password, account.password);
+
       if (!valid) {
-        throw new Error("Invalid password");
+        throw new Error("Invalid email or password");
       }
 
       // everything checks out, send them back some data
@@ -84,7 +89,7 @@ export const Auth = {
    * @param id - the ID of the account to be deleted
    * @param ctx - request context allows access to http headers
    */
-  async deleteAccount({ id }, ctx: Context) {
+  async deleteAccount(_, { id }, ctx: Context) {
     try {
       const accountId = getAccountId(ctx); // authenticate
 
