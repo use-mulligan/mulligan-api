@@ -198,6 +198,10 @@ type AggregateCourse {
   count: Int!
 }
 
+type AggregateGolfer {
+  count: Int!
+}
+
 type AggregateHole {
   count: Int!
 }
@@ -514,6 +518,227 @@ input CourseWhereUniqueInput {
 
 scalar DateTime
 
+type Golfer {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  scoreCard: Scorecard
+}
+
+type GolferConnection {
+  pageInfo: PageInfo!
+  edges: [GolferEdge]!
+  aggregate: AggregateGolfer!
+}
+
+input GolferCreateInput {
+  id: ID
+  name: String!
+  scoreCard: ScorecardCreateOneWithoutGolfersInput
+}
+
+input GolferCreateManyWithoutScoreCardInput {
+  create: [GolferCreateWithoutScoreCardInput!]
+  connect: [GolferWhereUniqueInput!]
+}
+
+input GolferCreateWithoutScoreCardInput {
+  id: ID
+  name: String!
+}
+
+type GolferEdge {
+  node: Golfer!
+  cursor: String!
+}
+
+enum GolferOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  name_ASC
+  name_DESC
+}
+
+type GolferPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+}
+
+input GolferScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  AND: [GolferScalarWhereInput!]
+  OR: [GolferScalarWhereInput!]
+  NOT: [GolferScalarWhereInput!]
+}
+
+type GolferSubscriptionPayload {
+  mutation: MutationType!
+  node: Golfer
+  updatedFields: [String!]
+  previousValues: GolferPreviousValues
+}
+
+input GolferSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: GolferWhereInput
+  AND: [GolferSubscriptionWhereInput!]
+  OR: [GolferSubscriptionWhereInput!]
+  NOT: [GolferSubscriptionWhereInput!]
+}
+
+input GolferUpdateInput {
+  name: String
+  scoreCard: ScorecardUpdateOneWithoutGolfersInput
+}
+
+input GolferUpdateManyDataInput {
+  name: String
+}
+
+input GolferUpdateManyMutationInput {
+  name: String
+}
+
+input GolferUpdateManyWithoutScoreCardInput {
+  create: [GolferCreateWithoutScoreCardInput!]
+  delete: [GolferWhereUniqueInput!]
+  connect: [GolferWhereUniqueInput!]
+  set: [GolferWhereUniqueInput!]
+  disconnect: [GolferWhereUniqueInput!]
+  update: [GolferUpdateWithWhereUniqueWithoutScoreCardInput!]
+  upsert: [GolferUpsertWithWhereUniqueWithoutScoreCardInput!]
+  deleteMany: [GolferScalarWhereInput!]
+  updateMany: [GolferUpdateManyWithWhereNestedInput!]
+}
+
+input GolferUpdateManyWithWhereNestedInput {
+  where: GolferScalarWhereInput!
+  data: GolferUpdateManyDataInput!
+}
+
+input GolferUpdateWithoutScoreCardDataInput {
+  name: String
+}
+
+input GolferUpdateWithWhereUniqueWithoutScoreCardInput {
+  where: GolferWhereUniqueInput!
+  data: GolferUpdateWithoutScoreCardDataInput!
+}
+
+input GolferUpsertWithWhereUniqueWithoutScoreCardInput {
+  where: GolferWhereUniqueInput!
+  update: GolferUpdateWithoutScoreCardDataInput!
+  create: GolferCreateWithoutScoreCardInput!
+}
+
+input GolferWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  scoreCard: ScorecardWhereInput
+  AND: [GolferWhereInput!]
+  OR: [GolferWhereInput!]
+  NOT: [GolferWhereInput!]
+}
+
+input GolferWhereUniqueInput {
+  id: ID
+}
+
 type Hole {
   id: ID!
   createdAt: DateTime!
@@ -523,10 +748,9 @@ type Hole {
   handicap: Int!
   par: Int!
   distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
-  scores(where: StrokeWhereInput, orderBy: StrokeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Stroke!]
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
 }
 
 type HoleConnection {
@@ -542,10 +766,9 @@ input HoleCreateInput {
   handicap: Int!
   par: Int!
   distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
-  scores: StrokeCreateManyWithoutHoleInput
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
 }
 
 input HoleCreateManyWithoutCourseInput {
@@ -553,8 +776,8 @@ input HoleCreateManyWithoutCourseInput {
   connect: [HoleWhereUniqueInput!]
 }
 
-input HoleCreateOneWithoutScoresInput {
-  create: HoleCreateWithoutScoresInput
+input HoleCreateOneInput {
+  create: HoleCreateInput
   connect: HoleWhereUniqueInput
 }
 
@@ -564,22 +787,9 @@ input HoleCreateWithoutCourseInput {
   handicap: Int!
   par: Int!
   distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
-  scores: StrokeCreateManyWithoutHoleInput
-}
-
-input HoleCreateWithoutScoresInput {
-  id: ID
-  course: CourseCreateOneWithoutHolesInput!
-  holeNum: Int!
-  handicap: Int!
-  par: Int!
-  distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
 }
 
 type HoleEdge {
@@ -618,9 +828,9 @@ type HolePreviousValues {
   handicap: Int!
   par: Int!
   distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
 }
 
 input HoleScalarWhereInput {
@@ -733,6 +943,17 @@ input HoleSubscriptionWhereInput {
   NOT: [HoleSubscriptionWhereInput!]
 }
 
+input HoleUpdateDataInput {
+  course: CourseUpdateOneRequiredWithoutHolesInput
+  holeNum: Int
+  handicap: Int
+  par: Int
+  distanceToFlag: Float
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
+}
+
 input HoleUpdateInput {
   course: CourseUpdateOneRequiredWithoutHolesInput
   holeNum: Int
@@ -742,7 +963,6 @@ input HoleUpdateInput {
   blueTee: Int
   whiteTee: Int
   redTee: Int
-  scores: StrokeUpdateManyWithoutHoleInput
 }
 
 input HoleUpdateManyDataInput {
@@ -782,26 +1002,14 @@ input HoleUpdateManyWithWhereNestedInput {
   data: HoleUpdateManyDataInput!
 }
 
-input HoleUpdateOneRequiredWithoutScoresInput {
-  create: HoleCreateWithoutScoresInput
-  update: HoleUpdateWithoutScoresDataInput
-  upsert: HoleUpsertWithoutScoresInput
+input HoleUpdateOneRequiredInput {
+  create: HoleCreateInput
+  update: HoleUpdateDataInput
+  upsert: HoleUpsertNestedInput
   connect: HoleWhereUniqueInput
 }
 
 input HoleUpdateWithoutCourseDataInput {
-  holeNum: Int
-  handicap: Int
-  par: Int
-  distanceToFlag: Float
-  blueTee: Int
-  whiteTee: Int
-  redTee: Int
-  scores: StrokeUpdateManyWithoutHoleInput
-}
-
-input HoleUpdateWithoutScoresDataInput {
-  course: CourseUpdateOneRequiredWithoutHolesInput
   holeNum: Int
   handicap: Int
   par: Int
@@ -816,9 +1024,9 @@ input HoleUpdateWithWhereUniqueWithoutCourseInput {
   data: HoleUpdateWithoutCourseDataInput!
 }
 
-input HoleUpsertWithoutScoresInput {
-  update: HoleUpdateWithoutScoresDataInput!
-  create: HoleCreateWithoutScoresInput!
+input HoleUpsertNestedInput {
+  update: HoleUpdateDataInput!
+  create: HoleCreateInput!
 }
 
 input HoleUpsertWithWhereUniqueWithoutCourseInput {
@@ -915,9 +1123,6 @@ input HoleWhereInput {
   redTee_lte: Int
   redTee_gt: Int
   redTee_gte: Int
-  scores_every: StrokeWhereInput
-  scores_some: StrokeWhereInput
-  scores_none: StrokeWhereInput
   AND: [HoleWhereInput!]
   OR: [HoleWhereInput!]
   NOT: [HoleWhereInput!]
@@ -942,6 +1147,12 @@ type Mutation {
   upsertCourse(where: CourseWhereUniqueInput!, create: CourseCreateInput!, update: CourseUpdateInput!): Course!
   deleteCourse(where: CourseWhereUniqueInput!): Course
   deleteManyCourses(where: CourseWhereInput): BatchPayload!
+  createGolfer(data: GolferCreateInput!): Golfer!
+  updateGolfer(data: GolferUpdateInput!, where: GolferWhereUniqueInput!): Golfer
+  updateManyGolfers(data: GolferUpdateManyMutationInput!, where: GolferWhereInput): BatchPayload!
+  upsertGolfer(where: GolferWhereUniqueInput!, create: GolferCreateInput!, update: GolferUpdateInput!): Golfer!
+  deleteGolfer(where: GolferWhereUniqueInput!): Golfer
+  deleteManyGolfers(where: GolferWhereInput): BatchPayload!
   createHole(data: HoleCreateInput!): Hole!
   updateHole(data: HoleUpdateInput!, where: HoleWhereUniqueInput!): Hole
   updateManyHoles(data: HoleUpdateManyMutationInput!, where: HoleWhereInput): BatchPayload!
@@ -956,7 +1167,6 @@ type Mutation {
   deleteManyProfiles(where: ProfileWhereInput): BatchPayload!
   createScorecard(data: ScorecardCreateInput!): Scorecard!
   updateScorecard(data: ScorecardUpdateInput!, where: ScorecardWhereUniqueInput!): Scorecard
-  updateManyScorecards(data: ScorecardUpdateManyMutationInput!, where: ScorecardWhereInput): BatchPayload!
   upsertScorecard(where: ScorecardWhereUniqueInput!, create: ScorecardCreateInput!, update: ScorecardUpdateInput!): Scorecard!
   deleteScorecard(where: ScorecardWhereUniqueInput!): Scorecard
   deleteManyScorecards(where: ScorecardWhereInput): BatchPayload!
@@ -991,6 +1201,7 @@ type Profile {
   updatedAt: DateTime!
   firstName: String!
   lastName: String!
+  fullName: String!
   account: Account!
   scoreCards(where: ScorecardWhereInput, orderBy: ScorecardOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Scorecard!]
 }
@@ -1005,6 +1216,7 @@ input ProfileCreateInput {
   id: ID
   firstName: String!
   lastName: String!
+  fullName: String!
   account: AccountCreateOneWithoutProfileInput!
   scoreCards: ScorecardCreateManyWithoutProfileInput
 }
@@ -1023,6 +1235,7 @@ input ProfileCreateWithoutAccountInput {
   id: ID
   firstName: String!
   lastName: String!
+  fullName: String!
   scoreCards: ScorecardCreateManyWithoutProfileInput
 }
 
@@ -1030,6 +1243,7 @@ input ProfileCreateWithoutScoreCardsInput {
   id: ID
   firstName: String!
   lastName: String!
+  fullName: String!
   account: AccountCreateOneWithoutProfileInput!
 }
 
@@ -1049,6 +1263,8 @@ enum ProfileOrderByInput {
   firstName_DESC
   lastName_ASC
   lastName_DESC
+  fullName_ASC
+  fullName_DESC
 }
 
 type ProfilePreviousValues {
@@ -1057,6 +1273,7 @@ type ProfilePreviousValues {
   updatedAt: DateTime!
   firstName: String!
   lastName: String!
+  fullName: String!
 }
 
 type ProfileSubscriptionPayload {
@@ -1080,6 +1297,7 @@ input ProfileSubscriptionWhereInput {
 input ProfileUpdateInput {
   firstName: String
   lastName: String
+  fullName: String
   account: AccountUpdateOneRequiredWithoutProfileInput
   scoreCards: ScorecardUpdateManyWithoutProfileInput
 }
@@ -1087,6 +1305,7 @@ input ProfileUpdateInput {
 input ProfileUpdateManyMutationInput {
   firstName: String
   lastName: String
+  fullName: String
 }
 
 input ProfileUpdateOneRequiredWithoutAccountInput {
@@ -1106,12 +1325,14 @@ input ProfileUpdateOneRequiredWithoutScoreCardsInput {
 input ProfileUpdateWithoutAccountDataInput {
   firstName: String
   lastName: String
+  fullName: String
   scoreCards: ScorecardUpdateManyWithoutProfileInput
 }
 
 input ProfileUpdateWithoutScoreCardsDataInput {
   firstName: String
   lastName: String
+  fullName: String
   account: AccountUpdateOneRequiredWithoutProfileInput
 }
 
@@ -1184,6 +1405,20 @@ input ProfileWhereInput {
   lastName_not_starts_with: String
   lastName_ends_with: String
   lastName_not_ends_with: String
+  fullName: String
+  fullName_not: String
+  fullName_in: [String!]
+  fullName_not_in: [String!]
+  fullName_lt: String
+  fullName_lte: String
+  fullName_gt: String
+  fullName_gte: String
+  fullName_contains: String
+  fullName_not_contains: String
+  fullName_starts_with: String
+  fullName_not_starts_with: String
+  fullName_ends_with: String
+  fullName_not_ends_with: String
   account: AccountWhereInput
   scoreCards_every: ScorecardWhereInput
   scoreCards_some: ScorecardWhereInput
@@ -1204,6 +1439,9 @@ type Query {
   course(where: CourseWhereUniqueInput!): Course
   courses(where: CourseWhereInput, orderBy: CourseOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Course]!
   coursesConnection(where: CourseWhereInput, orderBy: CourseOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CourseConnection!
+  golfer(where: GolferWhereUniqueInput!): Golfer
+  golfers(where: GolferWhereInput, orderBy: GolferOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Golfer]!
+  golfersConnection(where: GolferWhereInput, orderBy: GolferOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): GolferConnection!
   hole(where: HoleWhereUniqueInput!): Hole
   holes(where: HoleWhereInput, orderBy: HoleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Hole]!
   holesConnection(where: HoleWhereInput, orderBy: HoleOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): HoleConnection!
@@ -1229,8 +1467,9 @@ type Scorecard {
   createdAt: DateTime!
   updatedAt: DateTime!
   profile: Profile!
-  golfers: [String!]!
+  golfers(where: GolferWhereInput, orderBy: GolferOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Golfer!]
   course: Course!
+  strokes(where: StrokeWhereInput, orderBy: StrokeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Stroke!]
 }
 
 type ScorecardConnection {
@@ -1239,15 +1478,12 @@ type ScorecardConnection {
   aggregate: AggregateScorecard!
 }
 
-input ScorecardCreategolfersInput {
-  set: [String!]
-}
-
 input ScorecardCreateInput {
   id: ID
   profile: ProfileCreateOneWithoutScoreCardsInput!
-  golfers: ScorecardCreategolfersInput
+  golfers: GolferCreateManyWithoutScoreCardInput
   course: CourseCreateOneWithoutScoreCardInput!
+  strokes: StrokeCreateManyWithoutScoreCardInput
 }
 
 input ScorecardCreateManyWithoutProfileInput {
@@ -1260,15 +1496,41 @@ input ScorecardCreateOneWithoutCourseInput {
   connect: ScorecardWhereUniqueInput
 }
 
+input ScorecardCreateOneWithoutGolfersInput {
+  create: ScorecardCreateWithoutGolfersInput
+  connect: ScorecardWhereUniqueInput
+}
+
+input ScorecardCreateOneWithoutStrokesInput {
+  create: ScorecardCreateWithoutStrokesInput
+  connect: ScorecardWhereUniqueInput
+}
+
 input ScorecardCreateWithoutCourseInput {
   id: ID
   profile: ProfileCreateOneWithoutScoreCardsInput!
-  golfers: ScorecardCreategolfersInput
+  golfers: GolferCreateManyWithoutScoreCardInput
+  strokes: StrokeCreateManyWithoutScoreCardInput
+}
+
+input ScorecardCreateWithoutGolfersInput {
+  id: ID
+  profile: ProfileCreateOneWithoutScoreCardsInput!
+  course: CourseCreateOneWithoutScoreCardInput!
+  strokes: StrokeCreateManyWithoutScoreCardInput
 }
 
 input ScorecardCreateWithoutProfileInput {
   id: ID
-  golfers: ScorecardCreategolfersInput
+  golfers: GolferCreateManyWithoutScoreCardInput
+  course: CourseCreateOneWithoutScoreCardInput!
+  strokes: StrokeCreateManyWithoutScoreCardInput
+}
+
+input ScorecardCreateWithoutStrokesInput {
+  id: ID
+  profile: ProfileCreateOneWithoutScoreCardsInput!
+  golfers: GolferCreateManyWithoutScoreCardInput
   course: CourseCreateOneWithoutScoreCardInput!
 }
 
@@ -1290,7 +1552,6 @@ type ScorecardPreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  golfers: [String!]!
 }
 
 input ScorecardScalarWhereInput {
@@ -1347,22 +1608,11 @@ input ScorecardSubscriptionWhereInput {
   NOT: [ScorecardSubscriptionWhereInput!]
 }
 
-input ScorecardUpdategolfersInput {
-  set: [String!]
-}
-
 input ScorecardUpdateInput {
   profile: ProfileUpdateOneRequiredWithoutScoreCardsInput
-  golfers: ScorecardUpdategolfersInput
+  golfers: GolferUpdateManyWithoutScoreCardInput
   course: CourseUpdateOneRequiredWithoutScoreCardInput
-}
-
-input ScorecardUpdateManyDataInput {
-  golfers: ScorecardUpdategolfersInput
-}
-
-input ScorecardUpdateManyMutationInput {
-  golfers: ScorecardUpdategolfersInput
+  strokes: StrokeUpdateManyWithoutScoreCardInput
 }
 
 input ScorecardUpdateManyWithoutProfileInput {
@@ -1374,12 +1624,6 @@ input ScorecardUpdateManyWithoutProfileInput {
   update: [ScorecardUpdateWithWhereUniqueWithoutProfileInput!]
   upsert: [ScorecardUpsertWithWhereUniqueWithoutProfileInput!]
   deleteMany: [ScorecardScalarWhereInput!]
-  updateMany: [ScorecardUpdateManyWithWhereNestedInput!]
-}
-
-input ScorecardUpdateManyWithWhereNestedInput {
-  where: ScorecardScalarWhereInput!
-  data: ScorecardUpdateManyDataInput!
 }
 
 input ScorecardUpdateOneRequiredWithoutCourseInput {
@@ -1389,13 +1633,45 @@ input ScorecardUpdateOneRequiredWithoutCourseInput {
   connect: ScorecardWhereUniqueInput
 }
 
+input ScorecardUpdateOneWithoutGolfersInput {
+  create: ScorecardCreateWithoutGolfersInput
+  update: ScorecardUpdateWithoutGolfersDataInput
+  upsert: ScorecardUpsertWithoutGolfersInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: ScorecardWhereUniqueInput
+}
+
+input ScorecardUpdateOneWithoutStrokesInput {
+  create: ScorecardCreateWithoutStrokesInput
+  update: ScorecardUpdateWithoutStrokesDataInput
+  upsert: ScorecardUpsertWithoutStrokesInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: ScorecardWhereUniqueInput
+}
+
 input ScorecardUpdateWithoutCourseDataInput {
   profile: ProfileUpdateOneRequiredWithoutScoreCardsInput
-  golfers: ScorecardUpdategolfersInput
+  golfers: GolferUpdateManyWithoutScoreCardInput
+  strokes: StrokeUpdateManyWithoutScoreCardInput
+}
+
+input ScorecardUpdateWithoutGolfersDataInput {
+  profile: ProfileUpdateOneRequiredWithoutScoreCardsInput
+  course: CourseUpdateOneRequiredWithoutScoreCardInput
+  strokes: StrokeUpdateManyWithoutScoreCardInput
 }
 
 input ScorecardUpdateWithoutProfileDataInput {
-  golfers: ScorecardUpdategolfersInput
+  golfers: GolferUpdateManyWithoutScoreCardInput
+  course: CourseUpdateOneRequiredWithoutScoreCardInput
+  strokes: StrokeUpdateManyWithoutScoreCardInput
+}
+
+input ScorecardUpdateWithoutStrokesDataInput {
+  profile: ProfileUpdateOneRequiredWithoutScoreCardsInput
+  golfers: GolferUpdateManyWithoutScoreCardInput
   course: CourseUpdateOneRequiredWithoutScoreCardInput
 }
 
@@ -1407,6 +1683,16 @@ input ScorecardUpdateWithWhereUniqueWithoutProfileInput {
 input ScorecardUpsertWithoutCourseInput {
   update: ScorecardUpdateWithoutCourseDataInput!
   create: ScorecardCreateWithoutCourseInput!
+}
+
+input ScorecardUpsertWithoutGolfersInput {
+  update: ScorecardUpdateWithoutGolfersDataInput!
+  create: ScorecardCreateWithoutGolfersInput!
+}
+
+input ScorecardUpsertWithoutStrokesInput {
+  update: ScorecardUpdateWithoutStrokesDataInput!
+  create: ScorecardCreateWithoutStrokesInput!
 }
 
 input ScorecardUpsertWithWhereUniqueWithoutProfileInput {
@@ -1447,7 +1733,13 @@ input ScorecardWhereInput {
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
   profile: ProfileWhereInput
+  golfers_every: GolferWhereInput
+  golfers_some: GolferWhereInput
+  golfers_none: GolferWhereInput
   course: CourseWhereInput
+  strokes_every: StrokeWhereInput
+  strokes_some: StrokeWhereInput
+  strokes_none: StrokeWhereInput
   AND: [ScorecardWhereInput!]
   OR: [ScorecardWhereInput!]
   NOT: [ScorecardWhereInput!]
@@ -1461,8 +1753,10 @@ type Stroke {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  golferId: ID
+  profileId: ID
   hole: Hole!
-  golfer: String!
+  scoreCard: Scorecard
   strokes: Int!
 }
 
@@ -1474,19 +1768,23 @@ type StrokeConnection {
 
 input StrokeCreateInput {
   id: ID
-  hole: HoleCreateOneWithoutScoresInput!
-  golfer: String!
+  golferId: ID
+  profileId: ID
+  hole: HoleCreateOneInput!
+  scoreCard: ScorecardCreateOneWithoutStrokesInput
   strokes: Int!
 }
 
-input StrokeCreateManyWithoutHoleInput {
-  create: [StrokeCreateWithoutHoleInput!]
+input StrokeCreateManyWithoutScoreCardInput {
+  create: [StrokeCreateWithoutScoreCardInput!]
   connect: [StrokeWhereUniqueInput!]
 }
 
-input StrokeCreateWithoutHoleInput {
+input StrokeCreateWithoutScoreCardInput {
   id: ID
-  golfer: String!
+  golferId: ID
+  profileId: ID
+  hole: HoleCreateOneInput!
   strokes: Int!
 }
 
@@ -1502,8 +1800,10 @@ enum StrokeOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  golfer_ASC
-  golfer_DESC
+  golferId_ASC
+  golferId_DESC
+  profileId_ASC
+  profileId_DESC
   strokes_ASC
   strokes_DESC
 }
@@ -1512,7 +1812,8 @@ type StrokePreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  golfer: String!
+  golferId: ID
+  profileId: ID
   strokes: Int!
 }
 
@@ -1547,20 +1848,34 @@ input StrokeScalarWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
-  golfer: String
-  golfer_not: String
-  golfer_in: [String!]
-  golfer_not_in: [String!]
-  golfer_lt: String
-  golfer_lte: String
-  golfer_gt: String
-  golfer_gte: String
-  golfer_contains: String
-  golfer_not_contains: String
-  golfer_starts_with: String
-  golfer_not_starts_with: String
-  golfer_ends_with: String
-  golfer_not_ends_with: String
+  golferId: ID
+  golferId_not: ID
+  golferId_in: [ID!]
+  golferId_not_in: [ID!]
+  golferId_lt: ID
+  golferId_lte: ID
+  golferId_gt: ID
+  golferId_gte: ID
+  golferId_contains: ID
+  golferId_not_contains: ID
+  golferId_starts_with: ID
+  golferId_not_starts_with: ID
+  golferId_ends_with: ID
+  golferId_not_ends_with: ID
+  profileId: ID
+  profileId_not: ID
+  profileId_in: [ID!]
+  profileId_not_in: [ID!]
+  profileId_lt: ID
+  profileId_lte: ID
+  profileId_gt: ID
+  profileId_gte: ID
+  profileId_contains: ID
+  profileId_not_contains: ID
+  profileId_starts_with: ID
+  profileId_not_starts_with: ID
+  profileId_ends_with: ID
+  profileId_not_ends_with: ID
   strokes: Int
   strokes_not: Int
   strokes_in: [Int!]
@@ -1593,29 +1908,33 @@ input StrokeSubscriptionWhereInput {
 }
 
 input StrokeUpdateInput {
-  hole: HoleUpdateOneRequiredWithoutScoresInput
-  golfer: String
+  golferId: ID
+  profileId: ID
+  hole: HoleUpdateOneRequiredInput
+  scoreCard: ScorecardUpdateOneWithoutStrokesInput
   strokes: Int
 }
 
 input StrokeUpdateManyDataInput {
-  golfer: String
+  golferId: ID
+  profileId: ID
   strokes: Int
 }
 
 input StrokeUpdateManyMutationInput {
-  golfer: String
+  golferId: ID
+  profileId: ID
   strokes: Int
 }
 
-input StrokeUpdateManyWithoutHoleInput {
-  create: [StrokeCreateWithoutHoleInput!]
+input StrokeUpdateManyWithoutScoreCardInput {
+  create: [StrokeCreateWithoutScoreCardInput!]
   delete: [StrokeWhereUniqueInput!]
   connect: [StrokeWhereUniqueInput!]
   set: [StrokeWhereUniqueInput!]
   disconnect: [StrokeWhereUniqueInput!]
-  update: [StrokeUpdateWithWhereUniqueWithoutHoleInput!]
-  upsert: [StrokeUpsertWithWhereUniqueWithoutHoleInput!]
+  update: [StrokeUpdateWithWhereUniqueWithoutScoreCardInput!]
+  upsert: [StrokeUpsertWithWhereUniqueWithoutScoreCardInput!]
   deleteMany: [StrokeScalarWhereInput!]
   updateMany: [StrokeUpdateManyWithWhereNestedInput!]
 }
@@ -1625,20 +1944,22 @@ input StrokeUpdateManyWithWhereNestedInput {
   data: StrokeUpdateManyDataInput!
 }
 
-input StrokeUpdateWithoutHoleDataInput {
-  golfer: String
+input StrokeUpdateWithoutScoreCardDataInput {
+  golferId: ID
+  profileId: ID
+  hole: HoleUpdateOneRequiredInput
   strokes: Int
 }
 
-input StrokeUpdateWithWhereUniqueWithoutHoleInput {
+input StrokeUpdateWithWhereUniqueWithoutScoreCardInput {
   where: StrokeWhereUniqueInput!
-  data: StrokeUpdateWithoutHoleDataInput!
+  data: StrokeUpdateWithoutScoreCardDataInput!
 }
 
-input StrokeUpsertWithWhereUniqueWithoutHoleInput {
+input StrokeUpsertWithWhereUniqueWithoutScoreCardInput {
   where: StrokeWhereUniqueInput!
-  update: StrokeUpdateWithoutHoleDataInput!
-  create: StrokeCreateWithoutHoleInput!
+  update: StrokeUpdateWithoutScoreCardDataInput!
+  create: StrokeCreateWithoutScoreCardInput!
 }
 
 input StrokeWhereInput {
@@ -1672,21 +1993,36 @@ input StrokeWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  golferId: ID
+  golferId_not: ID
+  golferId_in: [ID!]
+  golferId_not_in: [ID!]
+  golferId_lt: ID
+  golferId_lte: ID
+  golferId_gt: ID
+  golferId_gte: ID
+  golferId_contains: ID
+  golferId_not_contains: ID
+  golferId_starts_with: ID
+  golferId_not_starts_with: ID
+  golferId_ends_with: ID
+  golferId_not_ends_with: ID
+  profileId: ID
+  profileId_not: ID
+  profileId_in: [ID!]
+  profileId_not_in: [ID!]
+  profileId_lt: ID
+  profileId_lte: ID
+  profileId_gt: ID
+  profileId_gte: ID
+  profileId_contains: ID
+  profileId_not_contains: ID
+  profileId_starts_with: ID
+  profileId_not_starts_with: ID
+  profileId_ends_with: ID
+  profileId_not_ends_with: ID
   hole: HoleWhereInput
-  golfer: String
-  golfer_not: String
-  golfer_in: [String!]
-  golfer_not_in: [String!]
-  golfer_lt: String
-  golfer_lte: String
-  golfer_gt: String
-  golfer_gte: String
-  golfer_contains: String
-  golfer_not_contains: String
-  golfer_starts_with: String
-  golfer_not_starts_with: String
-  golfer_ends_with: String
-  golfer_not_ends_with: String
+  scoreCard: ScorecardWhereInput
   strokes: Int
   strokes_not: Int
   strokes_in: [Int!]
@@ -1707,6 +2043,7 @@ input StrokeWhereUniqueInput {
 type Subscription {
   account(where: AccountSubscriptionWhereInput): AccountSubscriptionPayload
   course(where: CourseSubscriptionWhereInput): CourseSubscriptionPayload
+  golfer(where: GolferSubscriptionWhereInput): GolferSubscriptionPayload
   hole(where: HoleSubscriptionWhereInput): HoleSubscriptionPayload
   profile(where: ProfileSubscriptionWhereInput): ProfileSubscriptionPayload
   scorecard(where: ScorecardSubscriptionWhereInput): ScorecardSubscriptionPayload

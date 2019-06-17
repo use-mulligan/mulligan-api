@@ -16,6 +16,7 @@ export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
 export interface Exists {
   account: (where?: AccountWhereInput) => Promise<boolean>;
   course: (where?: CourseWhereInput) => Promise<boolean>;
+  golfer: (where?: GolferWhereInput) => Promise<boolean>;
   hole: (where?: HoleWhereInput) => Promise<boolean>;
   profile: (where?: ProfileWhereInput) => Promise<boolean>;
   scorecard: (where?: ScorecardWhereInput) => Promise<boolean>;
@@ -79,6 +80,25 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => CourseConnectionPromise;
+  golfer: (where: GolferWhereUniqueInput) => GolferPromise;
+  golfers: (args?: {
+    where?: GolferWhereInput;
+    orderBy?: GolferOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<Golfer>;
+  golfersConnection: (args?: {
+    where?: GolferWhereInput;
+    orderBy?: GolferOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => GolferConnectionPromise;
   hole: (where: HoleWhereUniqueInput) => HolePromise;
   holes: (args?: {
     where?: HoleWhereInput;
@@ -193,6 +213,22 @@ export interface Prisma {
   }) => CoursePromise;
   deleteCourse: (where: CourseWhereUniqueInput) => CoursePromise;
   deleteManyCourses: (where?: CourseWhereInput) => BatchPayloadPromise;
+  createGolfer: (data: GolferCreateInput) => GolferPromise;
+  updateGolfer: (args: {
+    data: GolferUpdateInput;
+    where: GolferWhereUniqueInput;
+  }) => GolferPromise;
+  updateManyGolfers: (args: {
+    data: GolferUpdateManyMutationInput;
+    where?: GolferWhereInput;
+  }) => BatchPayloadPromise;
+  upsertGolfer: (args: {
+    where: GolferWhereUniqueInput;
+    create: GolferCreateInput;
+    update: GolferUpdateInput;
+  }) => GolferPromise;
+  deleteGolfer: (where: GolferWhereUniqueInput) => GolferPromise;
+  deleteManyGolfers: (where?: GolferWhereInput) => BatchPayloadPromise;
   createHole: (data: HoleCreateInput) => HolePromise;
   updateHole: (args: {
     data: HoleUpdateInput;
@@ -230,10 +266,6 @@ export interface Prisma {
     data: ScorecardUpdateInput;
     where: ScorecardWhereUniqueInput;
   }) => ScorecardPromise;
-  updateManyScorecards: (args: {
-    data: ScorecardUpdateManyMutationInput;
-    where?: ScorecardWhereInput;
-  }) => BatchPayloadPromise;
   upsertScorecard: (args: {
     where: ScorecardWhereUniqueInput;
     create: ScorecardCreateInput;
@@ -272,6 +304,9 @@ export interface Subscription {
   course: (
     where?: CourseSubscriptionWhereInput
   ) => CourseSubscriptionPayloadSubscription;
+  golfer: (
+    where?: GolferSubscriptionWhereInput
+  ) => GolferSubscriptionPayloadSubscription;
   hole: (
     where?: HoleSubscriptionWhereInput
   ) => HoleSubscriptionPayloadSubscription;
@@ -294,8 +329,6 @@ export interface ClientConstructor<T> {
  * Types
  */
 
-export type Role = "USER" | "ADMIN";
-
 export type ScorecardOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -303,6 +336,18 @@ export type ScorecardOrderByInput =
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
+
+export type Role = "USER" | "ADMIN";
+
+export type GolferOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
 
 export type HoleOrderByInput =
   | "id_ASC"
@@ -333,8 +378,10 @@ export type StrokeOrderByInput =
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC"
-  | "golfer_ASC"
-  | "golfer_DESC"
+  | "golferId_ASC"
+  | "golferId_DESC"
+  | "profileId_ASC"
+  | "profileId_DESC"
   | "strokes_ASC"
   | "strokes_DESC";
 
@@ -382,13 +429,16 @@ export type ProfileOrderByInput =
   | "firstName_ASC"
   | "firstName_DESC"
   | "lastName_ASC"
-  | "lastName_DESC";
+  | "lastName_DESC"
+  | "fullName_ASC"
+  | "fullName_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
-export interface StrokeUpdateWithoutHoleDataInput {
-  golfer?: String;
-  strokes?: Int;
+export interface GolferUpsertWithWhereUniqueWithoutScoreCardInput {
+  where: GolferWhereUniqueInput;
+  update: GolferUpdateWithoutScoreCardDataInput;
+  create: GolferCreateWithoutScoreCardInput;
 }
 
 export type AccountWhereUniqueInput = AtLeastOne<{
@@ -396,10 +446,14 @@ export type AccountWhereUniqueInput = AtLeastOne<{
   email?: String;
 }>;
 
-export interface HoleUpsertWithWhereUniqueWithoutCourseInput {
-  where: HoleWhereUniqueInput;
-  update: HoleUpdateWithoutCourseDataInput;
-  create: HoleCreateWithoutCourseInput;
+export interface CourseUpdateWithoutScoreCardDataInput {
+  courseName?: String;
+  courseAddress?: String;
+  coursePhone?: String;
+  long?: Float;
+  lat?: Float;
+  numberOfHoles?: Int;
+  holes?: HoleUpdateManyWithoutCourseInput;
 }
 
 export interface CourseWhereInput {
@@ -508,20 +562,673 @@ export interface CourseWhereInput {
   NOT?: CourseWhereInput[] | CourseWhereInput;
 }
 
-export interface StrokeCreateManyWithoutHoleInput {
-  create?: StrokeCreateWithoutHoleInput[] | StrokeCreateWithoutHoleInput;
-  connect?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
-}
-
-export interface AccountUpsertWithoutProfileInput {
-  update: AccountUpdateWithoutProfileDataInput;
-  create: AccountCreateWithoutProfileInput;
-}
-
-export interface StrokeCreateWithoutHoleInput {
+export interface HoleCreateInput {
   id?: ID_Input;
-  golfer: String;
-  strokes: Int;
+  course: CourseCreateOneWithoutHolesInput;
+  holeNum: Int;
+  handicap: Int;
+  par: Int;
+  distanceToFlag: Float;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
+}
+
+export interface AccountUpdateManyMutationInput {
+  email?: String;
+  password?: String;
+  role?: Role;
+}
+
+export interface CourseCreateOneWithoutHolesInput {
+  create?: CourseCreateWithoutHolesInput;
+  connect?: CourseWhereUniqueInput;
+}
+
+export interface HoleUpdateManyWithoutCourseInput {
+  create?: HoleCreateWithoutCourseInput[] | HoleCreateWithoutCourseInput;
+  delete?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
+  connect?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
+  set?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
+  disconnect?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
+  update?:
+    | HoleUpdateWithWhereUniqueWithoutCourseInput[]
+    | HoleUpdateWithWhereUniqueWithoutCourseInput;
+  upsert?:
+    | HoleUpsertWithWhereUniqueWithoutCourseInput[]
+    | HoleUpsertWithWhereUniqueWithoutCourseInput;
+  deleteMany?: HoleScalarWhereInput[] | HoleScalarWhereInput;
+  updateMany?:
+    | HoleUpdateManyWithWhereNestedInput[]
+    | HoleUpdateManyWithWhereNestedInput;
+}
+
+export interface CourseCreateWithoutHolesInput {
+  id?: ID_Input;
+  scoreCard: ScorecardCreateOneWithoutCourseInput;
+  courseName: String;
+  courseAddress: String;
+  coursePhone: String;
+  long: Float;
+  lat: Float;
+  numberOfHoles: Int;
+}
+
+export interface GolferWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  scoreCard?: ScorecardWhereInput;
+  AND?: GolferWhereInput[] | GolferWhereInput;
+  OR?: GolferWhereInput[] | GolferWhereInput;
+  NOT?: GolferWhereInput[] | GolferWhereInput;
+}
+
+export interface ScorecardCreateOneWithoutCourseInput {
+  create?: ScorecardCreateWithoutCourseInput;
+  connect?: ScorecardWhereUniqueInput;
+}
+
+export interface AccountWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  email?: String;
+  email_not?: String;
+  email_in?: String[] | String;
+  email_not_in?: String[] | String;
+  email_lt?: String;
+  email_lte?: String;
+  email_gt?: String;
+  email_gte?: String;
+  email_contains?: String;
+  email_not_contains?: String;
+  email_starts_with?: String;
+  email_not_starts_with?: String;
+  email_ends_with?: String;
+  email_not_ends_with?: String;
+  password?: String;
+  password_not?: String;
+  password_in?: String[] | String;
+  password_not_in?: String[] | String;
+  password_lt?: String;
+  password_lte?: String;
+  password_gt?: String;
+  password_gte?: String;
+  password_contains?: String;
+  password_not_contains?: String;
+  password_starts_with?: String;
+  password_not_starts_with?: String;
+  password_ends_with?: String;
+  password_not_ends_with?: String;
+  profile?: ProfileWhereInput;
+  role?: Role;
+  role_not?: Role;
+  role_in?: Role[] | Role;
+  role_not_in?: Role[] | Role;
+  AND?: AccountWhereInput[] | AccountWhereInput;
+  OR?: AccountWhereInput[] | AccountWhereInput;
+  NOT?: AccountWhereInput[] | AccountWhereInput;
+}
+
+export interface ScorecardCreateWithoutCourseInput {
+  id?: ID_Input;
+  profile: ProfileCreateOneWithoutScoreCardsInput;
+  golfers?: GolferCreateManyWithoutScoreCardInput;
+  strokes?: StrokeCreateManyWithoutScoreCardInput;
+}
+
+export interface ProfileSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: ProfileWhereInput;
+  AND?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
+  OR?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
+  NOT?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
+}
+
+export interface ProfileCreateOneWithoutScoreCardsInput {
+  create?: ProfileCreateWithoutScoreCardsInput;
+  connect?: ProfileWhereUniqueInput;
+}
+
+export interface HoleSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: HoleWhereInput;
+  AND?: HoleSubscriptionWhereInput[] | HoleSubscriptionWhereInput;
+  OR?: HoleSubscriptionWhereInput[] | HoleSubscriptionWhereInput;
+  NOT?: HoleSubscriptionWhereInput[] | HoleSubscriptionWhereInput;
+}
+
+export interface ProfileCreateWithoutScoreCardsInput {
+  id?: ID_Input;
+  firstName: String;
+  lastName: String;
+  fullName: String;
+  account: AccountCreateOneWithoutProfileInput;
+}
+
+export interface GolferSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: GolferWhereInput;
+  AND?: GolferSubscriptionWhereInput[] | GolferSubscriptionWhereInput;
+  OR?: GolferSubscriptionWhereInput[] | GolferSubscriptionWhereInput;
+  NOT?: GolferSubscriptionWhereInput[] | GolferSubscriptionWhereInput;
+}
+
+export interface AccountCreateOneWithoutProfileInput {
+  create?: AccountCreateWithoutProfileInput;
+  connect?: AccountWhereUniqueInput;
+}
+
+export interface AccountSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: AccountWhereInput;
+  AND?: AccountSubscriptionWhereInput[] | AccountSubscriptionWhereInput;
+  OR?: AccountSubscriptionWhereInput[] | AccountSubscriptionWhereInput;
+  NOT?: AccountSubscriptionWhereInput[] | AccountSubscriptionWhereInput;
+}
+
+export interface AccountCreateWithoutProfileInput {
+  id?: ID_Input;
+  email: String;
+  password: String;
+  role: Role;
+}
+
+export interface ScorecardUpsertWithoutStrokesInput {
+  update: ScorecardUpdateWithoutStrokesDataInput;
+  create: ScorecardCreateWithoutStrokesInput;
+}
+
+export interface AccountUpdateInput {
+  email?: String;
+  password?: String;
+  profile?: ProfileUpdateOneRequiredWithoutAccountInput;
+  role?: Role;
+}
+
+export interface ScorecardUpdateOneWithoutStrokesInput {
+  create?: ScorecardCreateWithoutStrokesInput;
+  update?: ScorecardUpdateWithoutStrokesDataInput;
+  upsert?: ScorecardUpsertWithoutStrokesInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: ScorecardWhereUniqueInput;
+}
+
+export interface ProfileUpdateOneRequiredWithoutAccountInput {
+  create?: ProfileCreateWithoutAccountInput;
+  update?: ProfileUpdateWithoutAccountDataInput;
+  upsert?: ProfileUpsertWithoutAccountInput;
+  connect?: ProfileWhereUniqueInput;
+}
+
+export interface StrokeUpdateInput {
+  golferId?: ID_Input;
+  profileId?: ID_Input;
+  hole?: HoleUpdateOneRequiredInput;
+  scoreCard?: ScorecardUpdateOneWithoutStrokesInput;
+  strokes?: Int;
+}
+
+export interface ProfileUpdateWithoutAccountDataInput {
+  firstName?: String;
+  lastName?: String;
+  fullName?: String;
+  scoreCards?: ScorecardUpdateManyWithoutProfileInput;
+}
+
+export interface ScorecardCreateOneWithoutStrokesInput {
+  create?: ScorecardCreateWithoutStrokesInput;
+  connect?: ScorecardWhereUniqueInput;
+}
+
+export interface ScorecardUpdateManyWithoutProfileInput {
+  create?:
+    | ScorecardCreateWithoutProfileInput[]
+    | ScorecardCreateWithoutProfileInput;
+  delete?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
+  connect?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
+  set?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
+  disconnect?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
+  update?:
+    | ScorecardUpdateWithWhereUniqueWithoutProfileInput[]
+    | ScorecardUpdateWithWhereUniqueWithoutProfileInput;
+  upsert?:
+    | ScorecardUpsertWithWhereUniqueWithoutProfileInput[]
+    | ScorecardUpsertWithWhereUniqueWithoutProfileInput;
+  deleteMany?: ScorecardScalarWhereInput[] | ScorecardScalarWhereInput;
+}
+
+export type GolferWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface ScorecardUpdateWithWhereUniqueWithoutProfileInput {
+  where: ScorecardWhereUniqueInput;
+  data: ScorecardUpdateWithoutProfileDataInput;
+}
+
+export interface ScorecardCreateInput {
+  id?: ID_Input;
+  profile: ProfileCreateOneWithoutScoreCardsInput;
+  golfers?: GolferCreateManyWithoutScoreCardInput;
+  course: CourseCreateOneWithoutScoreCardInput;
+  strokes?: StrokeCreateManyWithoutScoreCardInput;
+}
+
+export interface ScorecardUpdateWithoutProfileDataInput {
+  golfers?: GolferUpdateManyWithoutScoreCardInput;
+  course?: CourseUpdateOneRequiredWithoutScoreCardInput;
+  strokes?: StrokeUpdateManyWithoutScoreCardInput;
+}
+
+export type HoleWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface GolferUpdateManyWithoutScoreCardInput {
+  create?:
+    | GolferCreateWithoutScoreCardInput[]
+    | GolferCreateWithoutScoreCardInput;
+  delete?: GolferWhereUniqueInput[] | GolferWhereUniqueInput;
+  connect?: GolferWhereUniqueInput[] | GolferWhereUniqueInput;
+  set?: GolferWhereUniqueInput[] | GolferWhereUniqueInput;
+  disconnect?: GolferWhereUniqueInput[] | GolferWhereUniqueInput;
+  update?:
+    | GolferUpdateWithWhereUniqueWithoutScoreCardInput[]
+    | GolferUpdateWithWhereUniqueWithoutScoreCardInput;
+  upsert?:
+    | GolferUpsertWithWhereUniqueWithoutScoreCardInput[]
+    | GolferUpsertWithWhereUniqueWithoutScoreCardInput;
+  deleteMany?: GolferScalarWhereInput[] | GolferScalarWhereInput;
+  updateMany?:
+    | GolferUpdateManyWithWhereNestedInput[]
+    | GolferUpdateManyWithWhereNestedInput;
+}
+
+export interface ProfileCreateInput {
+  id?: ID_Input;
+  firstName: String;
+  lastName: String;
+  fullName: String;
+  account: AccountCreateOneWithoutProfileInput;
+  scoreCards?: ScorecardCreateManyWithoutProfileInput;
+}
+
+export interface GolferUpdateWithWhereUniqueWithoutScoreCardInput {
+  where: GolferWhereUniqueInput;
+  data: GolferUpdateWithoutScoreCardDataInput;
+}
+
+export type ProfileWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface GolferUpdateWithoutScoreCardDataInput {
+  name?: String;
+}
+
+export interface GolferUpdateManyMutationInput {
+  name?: String;
+}
+
+export interface CourseUpdateInput {
+  scoreCard?: ScorecardUpdateOneRequiredWithoutCourseInput;
+  courseName?: String;
+  courseAddress?: String;
+  coursePhone?: String;
+  long?: Float;
+  lat?: Float;
+  numberOfHoles?: Int;
+  holes?: HoleUpdateManyWithoutCourseInput;
+}
+
+export interface ScorecardUpdateWithoutGolfersDataInput {
+  profile?: ProfileUpdateOneRequiredWithoutScoreCardsInput;
+  course?: CourseUpdateOneRequiredWithoutScoreCardInput;
+  strokes?: StrokeUpdateManyWithoutScoreCardInput;
+}
+
+export interface GolferScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  AND?: GolferScalarWhereInput[] | GolferScalarWhereInput;
+  OR?: GolferScalarWhereInput[] | GolferScalarWhereInput;
+  NOT?: GolferScalarWhereInput[] | GolferScalarWhereInput;
+}
+
+export interface ScorecardUpdateOneWithoutGolfersInput {
+  create?: ScorecardCreateWithoutGolfersInput;
+  update?: ScorecardUpdateWithoutGolfersDataInput;
+  upsert?: ScorecardUpsertWithoutGolfersInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: ScorecardWhereUniqueInput;
+}
+
+export interface GolferUpdateManyWithWhereNestedInput {
+  where: GolferScalarWhereInput;
+  data: GolferUpdateManyDataInput;
+}
+
+export interface ScorecardCreateWithoutGolfersInput {
+  id?: ID_Input;
+  profile: ProfileCreateOneWithoutScoreCardsInput;
+  course: CourseCreateOneWithoutScoreCardInput;
+  strokes?: StrokeCreateManyWithoutScoreCardInput;
+}
+
+export interface GolferUpdateManyDataInput {
+  name?: String;
+}
+
+export interface ScorecardCreateOneWithoutGolfersInput {
+  create?: ScorecardCreateWithoutGolfersInput;
+  connect?: ScorecardWhereUniqueInput;
+}
+
+export interface CourseUpdateOneRequiredWithoutScoreCardInput {
+  create?: CourseCreateWithoutScoreCardInput;
+  update?: CourseUpdateWithoutScoreCardDataInput;
+  upsert?: CourseUpsertWithoutScoreCardInput;
+  connect?: CourseWhereUniqueInput;
+}
+
+export interface CourseUpdateManyMutationInput {
+  courseName?: String;
+  courseAddress?: String;
+  coursePhone?: String;
+  long?: Float;
+  lat?: Float;
+  numberOfHoles?: Int;
+}
+
+export interface CourseCreateInput {
+  id?: ID_Input;
+  scoreCard: ScorecardCreateOneWithoutCourseInput;
+  courseName: String;
+  courseAddress: String;
+  coursePhone: String;
+  long: Float;
+  lat: Float;
+  numberOfHoles: Int;
+  holes?: HoleCreateManyWithoutCourseInput;
+}
+
+export interface AccountCreateInput {
+  id?: ID_Input;
+  email: String;
+  password: String;
+  profile: ProfileCreateOneWithoutAccountInput;
+  role: Role;
+}
+
+export interface HoleWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  course?: CourseWhereInput;
+  holeNum?: Int;
+  holeNum_not?: Int;
+  holeNum_in?: Int[] | Int;
+  holeNum_not_in?: Int[] | Int;
+  holeNum_lt?: Int;
+  holeNum_lte?: Int;
+  holeNum_gt?: Int;
+  holeNum_gte?: Int;
+  handicap?: Int;
+  handicap_not?: Int;
+  handicap_in?: Int[] | Int;
+  handicap_not_in?: Int[] | Int;
+  handicap_lt?: Int;
+  handicap_lte?: Int;
+  handicap_gt?: Int;
+  handicap_gte?: Int;
+  par?: Int;
+  par_not?: Int;
+  par_in?: Int[] | Int;
+  par_not_in?: Int[] | Int;
+  par_lt?: Int;
+  par_lte?: Int;
+  par_gt?: Int;
+  par_gte?: Int;
+  distanceToFlag?: Float;
+  distanceToFlag_not?: Float;
+  distanceToFlag_in?: Float[] | Float;
+  distanceToFlag_not_in?: Float[] | Float;
+  distanceToFlag_lt?: Float;
+  distanceToFlag_lte?: Float;
+  distanceToFlag_gt?: Float;
+  distanceToFlag_gte?: Float;
+  blueTee?: Int;
+  blueTee_not?: Int;
+  blueTee_in?: Int[] | Int;
+  blueTee_not_in?: Int[] | Int;
+  blueTee_lt?: Int;
+  blueTee_lte?: Int;
+  blueTee_gt?: Int;
+  blueTee_gte?: Int;
+  whiteTee?: Int;
+  whiteTee_not?: Int;
+  whiteTee_in?: Int[] | Int;
+  whiteTee_not_in?: Int[] | Int;
+  whiteTee_lt?: Int;
+  whiteTee_lte?: Int;
+  whiteTee_gt?: Int;
+  whiteTee_gte?: Int;
+  redTee?: Int;
+  redTee_not?: Int;
+  redTee_in?: Int[] | Int;
+  redTee_not_in?: Int[] | Int;
+  redTee_lt?: Int;
+  redTee_lte?: Int;
+  redTee_gt?: Int;
+  redTee_gte?: Int;
+  AND?: HoleWhereInput[] | HoleWhereInput;
+  OR?: HoleWhereInput[] | HoleWhereInput;
+  NOT?: HoleWhereInput[] | HoleWhereInput;
+}
+
+export interface ProfileCreateWithoutAccountInput {
+  id?: ID_Input;
+  firstName: String;
+  lastName: String;
+  fullName: String;
+  scoreCards?: ScorecardCreateManyWithoutProfileInput;
+}
+
+export interface HoleUpdateWithWhereUniqueWithoutCourseInput {
+  where: HoleWhereUniqueInput;
+  data: HoleUpdateWithoutCourseDataInput;
+}
+
+export interface ScorecardCreateWithoutProfileInput {
+  id?: ID_Input;
+  golfers?: GolferCreateManyWithoutScoreCardInput;
+  course: CourseCreateOneWithoutScoreCardInput;
+  strokes?: StrokeCreateManyWithoutScoreCardInput;
+}
+
+export interface HoleUpdateWithoutCourseDataInput {
+  holeNum?: Int;
+  handicap?: Int;
+  par?: Int;
+  distanceToFlag?: Float;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
+}
+
+export interface GolferCreateWithoutScoreCardInput {
+  id?: ID_Input;
+  name: String;
+}
+
+export interface HoleUpsertWithWhereUniqueWithoutCourseInput {
+  where: HoleWhereUniqueInput;
+  update: HoleUpdateWithoutCourseDataInput;
+  create: HoleCreateWithoutCourseInput;
+}
+
+export interface CourseCreateWithoutScoreCardInput {
+  id?: ID_Input;
+  courseName: String;
+  courseAddress: String;
+  coursePhone: String;
+  long: Float;
+  lat: Float;
+  numberOfHoles: Int;
+  holes?: HoleCreateManyWithoutCourseInput;
 }
 
 export interface HoleScalarWhereInput {
@@ -616,541 +1323,15 @@ export interface HoleScalarWhereInput {
   NOT?: HoleScalarWhereInput[] | HoleScalarWhereInput;
 }
 
-export interface AccountUpdateInput {
-  email?: String;
-  password?: String;
-  profile?: ProfileUpdateOneRequiredWithoutAccountInput;
-  role?: Role;
-}
-
-export interface AccountWhereInput {
+export interface HoleCreateWithoutCourseInput {
   id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  createdAt?: DateTimeInput;
-  createdAt_not?: DateTimeInput;
-  createdAt_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_lt?: DateTimeInput;
-  createdAt_lte?: DateTimeInput;
-  createdAt_gt?: DateTimeInput;
-  createdAt_gte?: DateTimeInput;
-  updatedAt?: DateTimeInput;
-  updatedAt_not?: DateTimeInput;
-  updatedAt_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_lt?: DateTimeInput;
-  updatedAt_lte?: DateTimeInput;
-  updatedAt_gt?: DateTimeInput;
-  updatedAt_gte?: DateTimeInput;
-  email?: String;
-  email_not?: String;
-  email_in?: String[] | String;
-  email_not_in?: String[] | String;
-  email_lt?: String;
-  email_lte?: String;
-  email_gt?: String;
-  email_gte?: String;
-  email_contains?: String;
-  email_not_contains?: String;
-  email_starts_with?: String;
-  email_not_starts_with?: String;
-  email_ends_with?: String;
-  email_not_ends_with?: String;
-  password?: String;
-  password_not?: String;
-  password_in?: String[] | String;
-  password_not_in?: String[] | String;
-  password_lt?: String;
-  password_lte?: String;
-  password_gt?: String;
-  password_gte?: String;
-  password_contains?: String;
-  password_not_contains?: String;
-  password_starts_with?: String;
-  password_not_starts_with?: String;
-  password_ends_with?: String;
-  password_not_ends_with?: String;
-  profile?: ProfileWhereInput;
-  role?: Role;
-  role_not?: Role;
-  role_in?: Role[] | Role;
-  role_not_in?: Role[] | Role;
-  AND?: AccountWhereInput[] | AccountWhereInput;
-  OR?: AccountWhereInput[] | AccountWhereInput;
-  NOT?: AccountWhereInput[] | AccountWhereInput;
-}
-
-export interface ProfileUpdateOneRequiredWithoutAccountInput {
-  create?: ProfileCreateWithoutAccountInput;
-  update?: ProfileUpdateWithoutAccountDataInput;
-  upsert?: ProfileUpsertWithoutAccountInput;
-  connect?: ProfileWhereUniqueInput;
-}
-
-export interface ScorecardSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: ScorecardWhereInput;
-  AND?: ScorecardSubscriptionWhereInput[] | ScorecardSubscriptionWhereInput;
-  OR?: ScorecardSubscriptionWhereInput[] | ScorecardSubscriptionWhereInput;
-  NOT?: ScorecardSubscriptionWhereInput[] | ScorecardSubscriptionWhereInput;
-}
-
-export interface ProfileUpdateWithoutAccountDataInput {
-  firstName?: String;
-  lastName?: String;
-  scoreCards?: ScorecardUpdateManyWithoutProfileInput;
-}
-
-export interface ProfileSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: ProfileWhereInput;
-  AND?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
-  OR?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
-  NOT?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
-}
-
-export interface ScorecardUpdateManyWithoutProfileInput {
-  create?:
-    | ScorecardCreateWithoutProfileInput[]
-    | ScorecardCreateWithoutProfileInput;
-  delete?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
-  connect?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
-  set?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
-  disconnect?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
-  update?:
-    | ScorecardUpdateWithWhereUniqueWithoutProfileInput[]
-    | ScorecardUpdateWithWhereUniqueWithoutProfileInput;
-  upsert?:
-    | ScorecardUpsertWithWhereUniqueWithoutProfileInput[]
-    | ScorecardUpsertWithWhereUniqueWithoutProfileInput;
-  deleteMany?: ScorecardScalarWhereInput[] | ScorecardScalarWhereInput;
-  updateMany?:
-    | ScorecardUpdateManyWithWhereNestedInput[]
-    | ScorecardUpdateManyWithWhereNestedInput;
-}
-
-export interface HoleSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: HoleWhereInput;
-  AND?: HoleSubscriptionWhereInput[] | HoleSubscriptionWhereInput;
-  OR?: HoleSubscriptionWhereInput[] | HoleSubscriptionWhereInput;
-  NOT?: HoleSubscriptionWhereInput[] | HoleSubscriptionWhereInput;
-}
-
-export interface ScorecardUpdateWithWhereUniqueWithoutProfileInput {
-  where: ScorecardWhereUniqueInput;
-  data: ScorecardUpdateWithoutProfileDataInput;
-}
-
-export interface AccountSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: AccountWhereInput;
-  AND?: AccountSubscriptionWhereInput[] | AccountSubscriptionWhereInput;
-  OR?: AccountSubscriptionWhereInput[] | AccountSubscriptionWhereInput;
-  NOT?: AccountSubscriptionWhereInput[] | AccountSubscriptionWhereInput;
-}
-
-export interface ScorecardUpdateWithoutProfileDataInput {
-  golfers?: ScorecardUpdategolfersInput;
-  course?: CourseUpdateOneRequiredWithoutScoreCardInput;
-}
-
-export interface HoleUpsertWithoutScoresInput {
-  update: HoleUpdateWithoutScoresDataInput;
-  create: HoleCreateWithoutScoresInput;
-}
-
-export interface ScorecardUpdategolfersInput {
-  set?: String[] | String;
-}
-
-export interface HoleUpdateOneRequiredWithoutScoresInput {
-  create?: HoleCreateWithoutScoresInput;
-  update?: HoleUpdateWithoutScoresDataInput;
-  upsert?: HoleUpsertWithoutScoresInput;
-  connect?: HoleWhereUniqueInput;
-}
-
-export interface CourseUpdateOneRequiredWithoutScoreCardInput {
-  create?: CourseCreateWithoutScoreCardInput;
-  update?: CourseUpdateWithoutScoreCardDataInput;
-  upsert?: CourseUpsertWithoutScoreCardInput;
-  connect?: CourseWhereUniqueInput;
-}
-
-export interface StrokeUpdateInput {
-  hole?: HoleUpdateOneRequiredWithoutScoresInput;
-  golfer?: String;
-  strokes?: Int;
-}
-
-export interface CourseUpdateWithoutScoreCardDataInput {
-  courseName?: String;
-  courseAddress?: String;
-  coursePhone?: String;
-  long?: Float;
-  lat?: Float;
-  numberOfHoles?: Int;
-  holes?: HoleUpdateManyWithoutCourseInput;
-}
-
-export interface HoleCreateOneWithoutScoresInput {
-  create?: HoleCreateWithoutScoresInput;
-  connect?: HoleWhereUniqueInput;
-}
-
-export interface HoleUpdateManyWithoutCourseInput {
-  create?: HoleCreateWithoutCourseInput[] | HoleCreateWithoutCourseInput;
-  delete?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
-  connect?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
-  set?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
-  disconnect?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
-  update?:
-    | HoleUpdateWithWhereUniqueWithoutCourseInput[]
-    | HoleUpdateWithWhereUniqueWithoutCourseInput;
-  upsert?:
-    | HoleUpsertWithWhereUniqueWithoutCourseInput[]
-    | HoleUpsertWithWhereUniqueWithoutCourseInput;
-  deleteMany?: HoleScalarWhereInput[] | HoleScalarWhereInput;
-  updateMany?:
-    | HoleUpdateManyWithWhereNestedInput[]
-    | HoleUpdateManyWithWhereNestedInput;
-}
-
-export type HoleWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface HoleUpdateWithWhereUniqueWithoutCourseInput {
-  where: HoleWhereUniqueInput;
-  data: HoleUpdateWithoutCourseDataInput;
-}
-
-export interface ScorecardUpdateInput {
-  profile?: ProfileUpdateOneRequiredWithoutScoreCardsInput;
-  golfers?: ScorecardUpdategolfersInput;
-  course?: CourseUpdateOneRequiredWithoutScoreCardInput;
-}
-
-export interface HoleUpdateWithoutCourseDataInput {
-  holeNum?: Int;
-  handicap?: Int;
-  par?: Int;
-  distanceToFlag?: Float;
-  blueTee?: Int;
-  whiteTee?: Int;
-  redTee?: Int;
-  scores?: StrokeUpdateManyWithoutHoleInput;
-}
-
-export type ProfileWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface StrokeUpdateManyWithoutHoleInput {
-  create?: StrokeCreateWithoutHoleInput[] | StrokeCreateWithoutHoleInput;
-  delete?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
-  connect?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
-  set?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
-  disconnect?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
-  update?:
-    | StrokeUpdateWithWhereUniqueWithoutHoleInput[]
-    | StrokeUpdateWithWhereUniqueWithoutHoleInput;
-  upsert?:
-    | StrokeUpsertWithWhereUniqueWithoutHoleInput[]
-    | StrokeUpsertWithWhereUniqueWithoutHoleInput;
-  deleteMany?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
-  updateMany?:
-    | StrokeUpdateManyWithWhereNestedInput[]
-    | StrokeUpdateManyWithWhereNestedInput;
-}
-
-export interface ProfileUpdateInput {
-  firstName?: String;
-  lastName?: String;
-  account?: AccountUpdateOneRequiredWithoutProfileInput;
-  scoreCards?: ScorecardUpdateManyWithoutProfileInput;
-}
-
-export interface StrokeUpdateWithWhereUniqueWithoutHoleInput {
-  where: StrokeWhereUniqueInput;
-  data: StrokeUpdateWithoutHoleDataInput;
-}
-
-export interface HoleUpdateManyMutationInput {
-  holeNum?: Int;
-  handicap?: Int;
-  par?: Int;
-  distanceToFlag?: Float;
-  blueTee?: Int;
-  whiteTee?: Int;
-  redTee?: Int;
-}
-
-export interface HoleCreateInput {
-  id?: ID_Input;
-  course: CourseCreateOneWithoutHolesInput;
   holeNum: Int;
   handicap: Int;
   par: Int;
   distanceToFlag: Float;
-  blueTee: Int;
-  whiteTee: Int;
-  redTee: Int;
-  scores?: StrokeCreateManyWithoutHoleInput;
-}
-
-export interface CourseUpsertWithoutHolesInput {
-  update: CourseUpdateWithoutHolesDataInput;
-  create: CourseCreateWithoutHolesInput;
-}
-
-export interface StrokeUpsertWithWhereUniqueWithoutHoleInput {
-  where: StrokeWhereUniqueInput;
-  update: StrokeUpdateWithoutHoleDataInput;
-  create: StrokeCreateWithoutHoleInput;
-}
-
-export interface CourseUpdateOneRequiredWithoutHolesInput {
-  create?: CourseCreateWithoutHolesInput;
-  update?: CourseUpdateWithoutHolesDataInput;
-  upsert?: CourseUpsertWithoutHolesInput;
-  connect?: CourseWhereUniqueInput;
-}
-
-export interface StrokeScalarWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  createdAt?: DateTimeInput;
-  createdAt_not?: DateTimeInput;
-  createdAt_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_lt?: DateTimeInput;
-  createdAt_lte?: DateTimeInput;
-  createdAt_gt?: DateTimeInput;
-  createdAt_gte?: DateTimeInput;
-  updatedAt?: DateTimeInput;
-  updatedAt_not?: DateTimeInput;
-  updatedAt_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_lt?: DateTimeInput;
-  updatedAt_lte?: DateTimeInput;
-  updatedAt_gt?: DateTimeInput;
-  updatedAt_gte?: DateTimeInput;
-  golfer?: String;
-  golfer_not?: String;
-  golfer_in?: String[] | String;
-  golfer_not_in?: String[] | String;
-  golfer_lt?: String;
-  golfer_lte?: String;
-  golfer_gt?: String;
-  golfer_gte?: String;
-  golfer_contains?: String;
-  golfer_not_contains?: String;
-  golfer_starts_with?: String;
-  golfer_not_starts_with?: String;
-  golfer_ends_with?: String;
-  golfer_not_ends_with?: String;
-  strokes?: Int;
-  strokes_not?: Int;
-  strokes_in?: Int[] | Int;
-  strokes_not_in?: Int[] | Int;
-  strokes_lt?: Int;
-  strokes_lte?: Int;
-  strokes_gt?: Int;
-  strokes_gte?: Int;
-  AND?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
-  OR?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
-  NOT?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
-}
-
-export interface HoleUpdateInput {
-  course?: CourseUpdateOneRequiredWithoutHolesInput;
-  holeNum?: Int;
-  handicap?: Int;
-  par?: Int;
-  distanceToFlag?: Float;
   blueTee?: Int;
   whiteTee?: Int;
   redTee?: Int;
-  scores?: StrokeUpdateManyWithoutHoleInput;
-}
-
-export interface StrokeUpdateManyWithWhereNestedInput {
-  where: StrokeScalarWhereInput;
-  data: StrokeUpdateManyDataInput;
-}
-
-export interface CourseCreateOneWithoutHolesInput {
-  create?: CourseCreateWithoutHolesInput;
-  connect?: CourseWhereUniqueInput;
-}
-
-export interface StrokeUpdateManyDataInput {
-  golfer?: String;
-  strokes?: Int;
-}
-
-export interface AccountCreateInput {
-  id?: ID_Input;
-  email: String;
-  password: String;
-  profile: ProfileCreateOneWithoutAccountInput;
-  role: Role;
-}
-
-export interface CourseUpdateManyMutationInput {
-  courseName?: String;
-  courseAddress?: String;
-  coursePhone?: String;
-  long?: Float;
-  lat?: Float;
-  numberOfHoles?: Int;
-}
-
-export interface ProfileCreateWithoutAccountInput {
-  id?: ID_Input;
-  firstName: String;
-  lastName: String;
-  scoreCards?: ScorecardCreateManyWithoutProfileInput;
-}
-
-export interface HoleWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  createdAt?: DateTimeInput;
-  createdAt_not?: DateTimeInput;
-  createdAt_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_lt?: DateTimeInput;
-  createdAt_lte?: DateTimeInput;
-  createdAt_gt?: DateTimeInput;
-  createdAt_gte?: DateTimeInput;
-  updatedAt?: DateTimeInput;
-  updatedAt_not?: DateTimeInput;
-  updatedAt_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_lt?: DateTimeInput;
-  updatedAt_lte?: DateTimeInput;
-  updatedAt_gt?: DateTimeInput;
-  updatedAt_gte?: DateTimeInput;
-  course?: CourseWhereInput;
-  holeNum?: Int;
-  holeNum_not?: Int;
-  holeNum_in?: Int[] | Int;
-  holeNum_not_in?: Int[] | Int;
-  holeNum_lt?: Int;
-  holeNum_lte?: Int;
-  holeNum_gt?: Int;
-  holeNum_gte?: Int;
-  handicap?: Int;
-  handicap_not?: Int;
-  handicap_in?: Int[] | Int;
-  handicap_not_in?: Int[] | Int;
-  handicap_lt?: Int;
-  handicap_lte?: Int;
-  handicap_gt?: Int;
-  handicap_gte?: Int;
-  par?: Int;
-  par_not?: Int;
-  par_in?: Int[] | Int;
-  par_not_in?: Int[] | Int;
-  par_lt?: Int;
-  par_lte?: Int;
-  par_gt?: Int;
-  par_gte?: Int;
-  distanceToFlag?: Float;
-  distanceToFlag_not?: Float;
-  distanceToFlag_in?: Float[] | Float;
-  distanceToFlag_not_in?: Float[] | Float;
-  distanceToFlag_lt?: Float;
-  distanceToFlag_lte?: Float;
-  distanceToFlag_gt?: Float;
-  distanceToFlag_gte?: Float;
-  blueTee?: Int;
-  blueTee_not?: Int;
-  blueTee_in?: Int[] | Int;
-  blueTee_not_in?: Int[] | Int;
-  blueTee_lt?: Int;
-  blueTee_lte?: Int;
-  blueTee_gt?: Int;
-  blueTee_gte?: Int;
-  whiteTee?: Int;
-  whiteTee_not?: Int;
-  whiteTee_in?: Int[] | Int;
-  whiteTee_not_in?: Int[] | Int;
-  whiteTee_lt?: Int;
-  whiteTee_lte?: Int;
-  whiteTee_gt?: Int;
-  whiteTee_gte?: Int;
-  redTee?: Int;
-  redTee_not?: Int;
-  redTee_in?: Int[] | Int;
-  redTee_not_in?: Int[] | Int;
-  redTee_lt?: Int;
-  redTee_lte?: Int;
-  redTee_gt?: Int;
-  redTee_gte?: Int;
-  scores_every?: StrokeWhereInput;
-  scores_some?: StrokeWhereInput;
-  scores_none?: StrokeWhereInput;
-  AND?: HoleWhereInput[] | HoleWhereInput;
-  OR?: HoleWhereInput[] | HoleWhereInput;
-  NOT?: HoleWhereInput[] | HoleWhereInput;
-}
-
-export interface ScorecardCreateWithoutProfileInput {
-  id?: ID_Input;
-  golfers?: ScorecardCreategolfersInput;
-  course: CourseCreateOneWithoutScoreCardInput;
 }
 
 export interface HoleUpdateManyWithWhereNestedInput {
@@ -1158,9 +1339,12 @@ export interface HoleUpdateManyWithWhereNestedInput {
   data: HoleUpdateManyDataInput;
 }
 
-export interface CourseCreateOneWithoutScoreCardInput {
-  create?: CourseCreateWithoutScoreCardInput;
-  connect?: CourseWhereUniqueInput;
+export interface StrokeCreateWithoutScoreCardInput {
+  id?: ID_Input;
+  golferId?: ID_Input;
+  profileId?: ID_Input;
+  hole: HoleCreateOneInput;
+  strokes: Int;
 }
 
 export interface HoleUpdateManyDataInput {
@@ -1171,16 +1355,6 @@ export interface HoleUpdateManyDataInput {
   blueTee?: Int;
   whiteTee?: Int;
   redTee?: Int;
-}
-
-export interface HoleCreateManyWithoutCourseInput {
-  create?: HoleCreateWithoutCourseInput[] | HoleCreateWithoutCourseInput;
-  connect?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
-}
-
-export interface CourseUpsertWithoutScoreCardInput {
-  update: CourseUpdateWithoutScoreCardDataInput;
-  create: CourseCreateWithoutScoreCardInput;
 }
 
 export interface StrokeWhereInput {
@@ -1214,21 +1388,36 @@ export interface StrokeWhereInput {
   updatedAt_lte?: DateTimeInput;
   updatedAt_gt?: DateTimeInput;
   updatedAt_gte?: DateTimeInput;
+  golferId?: ID_Input;
+  golferId_not?: ID_Input;
+  golferId_in?: ID_Input[] | ID_Input;
+  golferId_not_in?: ID_Input[] | ID_Input;
+  golferId_lt?: ID_Input;
+  golferId_lte?: ID_Input;
+  golferId_gt?: ID_Input;
+  golferId_gte?: ID_Input;
+  golferId_contains?: ID_Input;
+  golferId_not_contains?: ID_Input;
+  golferId_starts_with?: ID_Input;
+  golferId_not_starts_with?: ID_Input;
+  golferId_ends_with?: ID_Input;
+  golferId_not_ends_with?: ID_Input;
+  profileId?: ID_Input;
+  profileId_not?: ID_Input;
+  profileId_in?: ID_Input[] | ID_Input;
+  profileId_not_in?: ID_Input[] | ID_Input;
+  profileId_lt?: ID_Input;
+  profileId_lte?: ID_Input;
+  profileId_gt?: ID_Input;
+  profileId_gte?: ID_Input;
+  profileId_contains?: ID_Input;
+  profileId_not_contains?: ID_Input;
+  profileId_starts_with?: ID_Input;
+  profileId_not_starts_with?: ID_Input;
+  profileId_ends_with?: ID_Input;
+  profileId_not_ends_with?: ID_Input;
   hole?: HoleWhereInput;
-  golfer?: String;
-  golfer_not?: String;
-  golfer_in?: String[] | String;
-  golfer_not_in?: String[] | String;
-  golfer_lt?: String;
-  golfer_lte?: String;
-  golfer_gt?: String;
-  golfer_gte?: String;
-  golfer_contains?: String;
-  golfer_not_contains?: String;
-  golfer_starts_with?: String;
-  golfer_not_starts_with?: String;
-  golfer_ends_with?: String;
-  golfer_not_ends_with?: String;
+  scoreCard?: ScorecardWhereInput;
   strokes?: Int;
   strokes_not?: Int;
   strokes_in?: Int[] | Int;
@@ -1242,10 +1431,249 @@ export interface StrokeWhereInput {
   NOT?: StrokeWhereInput[] | StrokeWhereInput;
 }
 
-export interface ScorecardUpsertWithWhereUniqueWithoutProfileInput {
-  where: ScorecardWhereUniqueInput;
-  update: ScorecardUpdateWithoutProfileDataInput;
-  create: ScorecardCreateWithoutProfileInput;
+export interface CourseUpsertWithoutScoreCardInput {
+  update: CourseUpdateWithoutScoreCardDataInput;
+  create: CourseCreateWithoutScoreCardInput;
+}
+
+export interface ScorecardSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: ScorecardWhereInput;
+  AND?: ScorecardSubscriptionWhereInput[] | ScorecardSubscriptionWhereInput;
+  OR?: ScorecardSubscriptionWhereInput[] | ScorecardSubscriptionWhereInput;
+  NOT?: ScorecardSubscriptionWhereInput[] | ScorecardSubscriptionWhereInput;
+}
+
+export interface StrokeUpdateManyWithoutScoreCardInput {
+  create?:
+    | StrokeCreateWithoutScoreCardInput[]
+    | StrokeCreateWithoutScoreCardInput;
+  delete?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
+  connect?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
+  set?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
+  disconnect?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
+  update?:
+    | StrokeUpdateWithWhereUniqueWithoutScoreCardInput[]
+    | StrokeUpdateWithWhereUniqueWithoutScoreCardInput;
+  upsert?:
+    | StrokeUpsertWithWhereUniqueWithoutScoreCardInput[]
+    | StrokeUpsertWithWhereUniqueWithoutScoreCardInput;
+  deleteMany?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
+  updateMany?:
+    | StrokeUpdateManyWithWhereNestedInput[]
+    | StrokeUpdateManyWithWhereNestedInput;
+}
+
+export interface ScorecardWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  profile?: ProfileWhereInput;
+  golfers_every?: GolferWhereInput;
+  golfers_some?: GolferWhereInput;
+  golfers_none?: GolferWhereInput;
+  course?: CourseWhereInput;
+  strokes_every?: StrokeWhereInput;
+  strokes_some?: StrokeWhereInput;
+  strokes_none?: StrokeWhereInput;
+  AND?: ScorecardWhereInput[] | ScorecardWhereInput;
+  OR?: ScorecardWhereInput[] | ScorecardWhereInput;
+  NOT?: ScorecardWhereInput[] | ScorecardWhereInput;
+}
+
+export interface StrokeUpdateWithWhereUniqueWithoutScoreCardInput {
+  where: StrokeWhereUniqueInput;
+  data: StrokeUpdateWithoutScoreCardDataInput;
+}
+
+export interface StrokeUpdateManyMutationInput {
+  golferId?: ID_Input;
+  profileId?: ID_Input;
+  strokes?: Int;
+}
+
+export interface StrokeUpdateWithoutScoreCardDataInput {
+  golferId?: ID_Input;
+  profileId?: ID_Input;
+  hole?: HoleUpdateOneRequiredInput;
+  strokes?: Int;
+}
+
+export type CourseWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface HoleUpdateOneRequiredInput {
+  create?: HoleCreateInput;
+  update?: HoleUpdateDataInput;
+  upsert?: HoleUpsertNestedInput;
+  connect?: HoleWhereUniqueInput;
+}
+
+export interface StrokeCreateInput {
+  id?: ID_Input;
+  golferId?: ID_Input;
+  profileId?: ID_Input;
+  hole: HoleCreateOneInput;
+  scoreCard?: ScorecardCreateOneWithoutStrokesInput;
+  strokes: Int;
+}
+
+export interface HoleUpdateDataInput {
+  course?: CourseUpdateOneRequiredWithoutHolesInput;
+  holeNum?: Int;
+  handicap?: Int;
+  par?: Int;
+  distanceToFlag?: Float;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
+}
+
+export interface ProfileUpdateManyMutationInput {
+  firstName?: String;
+  lastName?: String;
+  fullName?: String;
+}
+
+export interface CourseUpdateOneRequiredWithoutHolesInput {
+  create?: CourseCreateWithoutHolesInput;
+  update?: CourseUpdateWithoutHolesDataInput;
+  upsert?: CourseUpsertWithoutHolesInput;
+  connect?: CourseWhereUniqueInput;
+}
+
+export interface HoleUpdateManyMutationInput {
+  holeNum?: Int;
+  handicap?: Int;
+  par?: Int;
+  distanceToFlag?: Float;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
+}
+
+export interface CourseUpdateWithoutHolesDataInput {
+  scoreCard?: ScorecardUpdateOneRequiredWithoutCourseInput;
+  courseName?: String;
+  courseAddress?: String;
+  coursePhone?: String;
+  long?: Float;
+  lat?: Float;
+  numberOfHoles?: Int;
+}
+
+export interface ScorecardUpsertWithoutGolfersInput {
+  update: ScorecardUpdateWithoutGolfersDataInput;
+  create: ScorecardCreateWithoutGolfersInput;
+}
+
+export interface ScorecardUpdateOneRequiredWithoutCourseInput {
+  create?: ScorecardCreateWithoutCourseInput;
+  update?: ScorecardUpdateWithoutCourseDataInput;
+  upsert?: ScorecardUpsertWithoutCourseInput;
+  connect?: ScorecardWhereUniqueInput;
+}
+
+export interface GolferUpdateInput {
+  name?: String;
+  scoreCard?: ScorecardUpdateOneWithoutGolfersInput;
+}
+
+export interface ScorecardUpdateWithoutCourseDataInput {
+  profile?: ProfileUpdateOneRequiredWithoutScoreCardsInput;
+  golfers?: GolferUpdateManyWithoutScoreCardInput;
+  strokes?: StrokeUpdateManyWithoutScoreCardInput;
+}
+
+export interface GolferCreateInput {
+  id?: ID_Input;
+  name: String;
+  scoreCard?: ScorecardCreateOneWithoutGolfersInput;
+}
+
+export interface ProfileUpdateOneRequiredWithoutScoreCardsInput {
+  create?: ProfileCreateWithoutScoreCardsInput;
+  update?: ProfileUpdateWithoutScoreCardsDataInput;
+  upsert?: ProfileUpsertWithoutScoreCardsInput;
+  connect?: ProfileWhereUniqueInput;
+}
+
+export interface ProfileCreateOneWithoutAccountInput {
+  create?: ProfileCreateWithoutAccountInput;
+  connect?: ProfileWhereUniqueInput;
+}
+
+export interface ProfileUpdateWithoutScoreCardsDataInput {
+  firstName?: String;
+  lastName?: String;
+  fullName?: String;
+  account?: AccountUpdateOneRequiredWithoutProfileInput;
+}
+
+export interface GolferCreateManyWithoutScoreCardInput {
+  create?:
+    | GolferCreateWithoutScoreCardInput[]
+    | GolferCreateWithoutScoreCardInput;
+  connect?: GolferWhereUniqueInput[] | GolferWhereUniqueInput;
+}
+
+export interface AccountUpdateOneRequiredWithoutProfileInput {
+  create?: AccountCreateWithoutProfileInput;
+  update?: AccountUpdateWithoutProfileDataInput;
+  upsert?: AccountUpsertWithoutProfileInput;
+  connect?: AccountWhereUniqueInput;
+}
+
+export interface HoleCreateManyWithoutCourseInput {
+  create?: HoleCreateWithoutCourseInput[] | HoleCreateWithoutCourseInput;
+  connect?: HoleWhereUniqueInput[] | HoleWhereUniqueInput;
+}
+
+export interface AccountUpdateWithoutProfileDataInput {
+  email?: String;
+  password?: String;
+  role?: Role;
+}
+
+export interface HoleCreateOneInput {
+  create?: HoleCreateInput;
+  connect?: HoleWhereUniqueInput;
+}
+
+export interface AccountUpsertWithoutProfileInput {
+  update: AccountUpdateWithoutProfileDataInput;
+  create: AccountCreateWithoutProfileInput;
 }
 
 export interface ProfileWhereInput {
@@ -1307,6 +1735,20 @@ export interface ProfileWhereInput {
   lastName_not_starts_with?: String;
   lastName_ends_with?: String;
   lastName_not_ends_with?: String;
+  fullName?: String;
+  fullName_not?: String;
+  fullName_in?: String[] | String;
+  fullName_not_in?: String[] | String;
+  fullName_lt?: String;
+  fullName_lte?: String;
+  fullName_gt?: String;
+  fullName_gte?: String;
+  fullName_contains?: String;
+  fullName_not_contains?: String;
+  fullName_starts_with?: String;
+  fullName_not_starts_with?: String;
+  fullName_ends_with?: String;
+  fullName_not_ends_with?: String;
   account?: AccountWhereInput;
   scoreCards_every?: ScorecardWhereInput;
   scoreCards_some?: ScorecardWhereInput;
@@ -1314,6 +1756,175 @@ export interface ProfileWhereInput {
   AND?: ProfileWhereInput[] | ProfileWhereInput;
   OR?: ProfileWhereInput[] | ProfileWhereInput;
   NOT?: ProfileWhereInput[] | ProfileWhereInput;
+}
+
+export interface ProfileUpsertWithoutScoreCardsInput {
+  update: ProfileUpdateWithoutScoreCardsDataInput;
+  create: ProfileCreateWithoutScoreCardsInput;
+}
+
+export interface ScorecardUpdateWithoutStrokesDataInput {
+  profile?: ProfileUpdateOneRequiredWithoutScoreCardsInput;
+  golfers?: GolferUpdateManyWithoutScoreCardInput;
+  course?: CourseUpdateOneRequiredWithoutScoreCardInput;
+}
+
+export interface ScorecardUpsertWithoutCourseInput {
+  update: ScorecardUpdateWithoutCourseDataInput;
+  create: ScorecardCreateWithoutCourseInput;
+}
+
+export interface ScorecardUpdateInput {
+  profile?: ProfileUpdateOneRequiredWithoutScoreCardsInput;
+  golfers?: GolferUpdateManyWithoutScoreCardInput;
+  course?: CourseUpdateOneRequiredWithoutScoreCardInput;
+  strokes?: StrokeUpdateManyWithoutScoreCardInput;
+}
+
+export interface CourseUpsertWithoutHolesInput {
+  update: CourseUpdateWithoutHolesDataInput;
+  create: CourseCreateWithoutHolesInput;
+}
+
+export interface HoleUpdateInput {
+  course?: CourseUpdateOneRequiredWithoutHolesInput;
+  holeNum?: Int;
+  handicap?: Int;
+  par?: Int;
+  distanceToFlag?: Float;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
+}
+
+export interface HoleUpsertNestedInput {
+  update: HoleUpdateDataInput;
+  create: HoleCreateInput;
+}
+
+export type StrokeWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface StrokeUpsertWithWhereUniqueWithoutScoreCardInput {
+  where: StrokeWhereUniqueInput;
+  update: StrokeUpdateWithoutScoreCardDataInput;
+  create: StrokeCreateWithoutScoreCardInput;
+}
+
+export interface ScorecardCreateManyWithoutProfileInput {
+  create?:
+    | ScorecardCreateWithoutProfileInput[]
+    | ScorecardCreateWithoutProfileInput;
+  connect?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
+}
+
+export interface StrokeScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  golferId?: ID_Input;
+  golferId_not?: ID_Input;
+  golferId_in?: ID_Input[] | ID_Input;
+  golferId_not_in?: ID_Input[] | ID_Input;
+  golferId_lt?: ID_Input;
+  golferId_lte?: ID_Input;
+  golferId_gt?: ID_Input;
+  golferId_gte?: ID_Input;
+  golferId_contains?: ID_Input;
+  golferId_not_contains?: ID_Input;
+  golferId_starts_with?: ID_Input;
+  golferId_not_starts_with?: ID_Input;
+  golferId_ends_with?: ID_Input;
+  golferId_not_ends_with?: ID_Input;
+  profileId?: ID_Input;
+  profileId_not?: ID_Input;
+  profileId_in?: ID_Input[] | ID_Input;
+  profileId_not_in?: ID_Input[] | ID_Input;
+  profileId_lt?: ID_Input;
+  profileId_lte?: ID_Input;
+  profileId_gt?: ID_Input;
+  profileId_gte?: ID_Input;
+  profileId_contains?: ID_Input;
+  profileId_not_contains?: ID_Input;
+  profileId_starts_with?: ID_Input;
+  profileId_not_starts_with?: ID_Input;
+  profileId_ends_with?: ID_Input;
+  profileId_not_ends_with?: ID_Input;
+  strokes?: Int;
+  strokes_not?: Int;
+  strokes_in?: Int[] | Int;
+  strokes_not_in?: Int[] | Int;
+  strokes_lt?: Int;
+  strokes_lte?: Int;
+  strokes_gt?: Int;
+  strokes_gte?: Int;
+  AND?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
+  OR?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
+  NOT?: StrokeScalarWhereInput[] | StrokeScalarWhereInput;
+}
+
+export interface StrokeCreateManyWithoutScoreCardInput {
+  create?:
+    | StrokeCreateWithoutScoreCardInput[]
+    | StrokeCreateWithoutScoreCardInput;
+  connect?: StrokeWhereUniqueInput[] | StrokeWhereUniqueInput;
+}
+
+export interface StrokeUpdateManyWithWhereNestedInput {
+  where: StrokeScalarWhereInput;
+  data: StrokeUpdateManyDataInput;
+}
+
+export interface CourseSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: CourseWhereInput;
+  AND?: CourseSubscriptionWhereInput[] | CourseSubscriptionWhereInput;
+  OR?: CourseSubscriptionWhereInput[] | CourseSubscriptionWhereInput;
+  NOT?: CourseSubscriptionWhereInput[] | CourseSubscriptionWhereInput;
+}
+
+export interface ProfileUpdateInput {
+  firstName?: String;
+  lastName?: String;
+  fullName?: String;
+  account?: AccountUpdateOneRequiredWithoutProfileInput;
+  scoreCards?: ScorecardUpdateManyWithoutProfileInput;
+}
+
+export interface ProfileUpsertWithoutAccountInput {
+  update: ProfileUpdateWithoutAccountDataInput;
+  create: ProfileCreateWithoutAccountInput;
 }
 
 export interface ScorecardScalarWhereInput {
@@ -1352,126 +1963,27 @@ export interface ScorecardScalarWhereInput {
   NOT?: ScorecardScalarWhereInput[] | ScorecardScalarWhereInput;
 }
 
-export interface CourseSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: CourseWhereInput;
-  AND?: CourseSubscriptionWhereInput[] | CourseSubscriptionWhereInput;
-  OR?: CourseSubscriptionWhereInput[] | CourseSubscriptionWhereInput;
-  NOT?: CourseSubscriptionWhereInput[] | CourseSubscriptionWhereInput;
+export interface ScorecardUpsertWithWhereUniqueWithoutProfileInput {
+  where: ScorecardWhereUniqueInput;
+  update: ScorecardUpdateWithoutProfileDataInput;
+  create: ScorecardCreateWithoutProfileInput;
 }
 
-export interface ScorecardUpdateManyWithWhereNestedInput {
-  where: ScorecardScalarWhereInput;
-  data: ScorecardUpdateManyDataInput;
-}
-
-export interface HoleUpdateWithoutScoresDataInput {
-  course?: CourseUpdateOneRequiredWithoutHolesInput;
-  holeNum?: Int;
-  handicap?: Int;
-  par?: Int;
-  distanceToFlag?: Float;
-  blueTee?: Int;
-  whiteTee?: Int;
-  redTee?: Int;
-}
-
-export interface ScorecardUpdateManyDataInput {
-  golfers?: ScorecardUpdategolfersInput;
-}
-
-export interface HoleCreateWithoutScoresInput {
-  id?: ID_Input;
-  course: CourseCreateOneWithoutHolesInput;
-  holeNum: Int;
-  handicap: Int;
-  par: Int;
-  distanceToFlag: Float;
-  blueTee: Int;
-  whiteTee: Int;
-  redTee: Int;
-}
-
-export interface ProfileUpsertWithoutAccountInput {
-  update: ProfileUpdateWithoutAccountDataInput;
-  create: ProfileCreateWithoutAccountInput;
-}
-
-export interface ScorecardUpdateManyMutationInput {
-  golfers?: ScorecardUpdategolfersInput;
-}
-
-export interface AccountUpdateManyMutationInput {
-  email?: String;
-  password?: String;
-  role?: Role;
-}
-
-export interface ProfileUpdateManyMutationInput {
-  firstName?: String;
-  lastName?: String;
-}
-
-export interface ScorecardUpsertWithoutCourseInput {
-  update: ScorecardUpdateWithoutCourseDataInput;
-  create: ScorecardCreateWithoutCourseInput;
+export interface StrokeUpdateManyDataInput {
+  golferId?: ID_Input;
+  profileId?: ID_Input;
+  strokes?: Int;
 }
 
 export type ScorecardWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
 }>;
 
-export interface ProfileUpsertWithoutScoreCardsInput {
-  update: ProfileUpdateWithoutScoreCardsDataInput;
-  create: ProfileCreateWithoutScoreCardsInput;
-}
-
-export type StrokeWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface CourseCreateInput {
-  id?: ID_Input;
-  scoreCard: ScorecardCreateOneWithoutCourseInput;
-  courseName: String;
-  courseAddress: String;
-  coursePhone: String;
-  long: Float;
-  lat: Float;
-  numberOfHoles: Int;
-  holes?: HoleCreateManyWithoutCourseInput;
-}
-
-export interface ScorecardCreateManyWithoutProfileInput {
-  create?:
-    | ScorecardCreateWithoutProfileInput[]
-    | ScorecardCreateWithoutProfileInput;
-  connect?: ScorecardWhereUniqueInput[] | ScorecardWhereUniqueInput;
-}
-
-export interface ScorecardCreateOneWithoutCourseInput {
-  create?: ScorecardCreateWithoutCourseInput;
-  connect?: ScorecardWhereUniqueInput;
-}
-
-export interface CourseCreateWithoutScoreCardInput {
-  id?: ID_Input;
-  courseName: String;
-  courseAddress: String;
-  coursePhone: String;
-  long: Float;
-  lat: Float;
-  numberOfHoles: Int;
-  holes?: HoleCreateManyWithoutCourseInput;
-}
-
-export interface ScorecardCreateWithoutCourseInput {
+export interface ScorecardCreateWithoutStrokesInput {
   id?: ID_Input;
   profile: ProfileCreateOneWithoutScoreCardsInput;
-  golfers?: ScorecardCreategolfersInput;
+  golfers?: GolferCreateManyWithoutScoreCardInput;
+  course: CourseCreateOneWithoutScoreCardInput;
 }
 
 export interface StrokeSubscriptionWhereInput {
@@ -1485,188 +1997,9 @@ export interface StrokeSubscriptionWhereInput {
   NOT?: StrokeSubscriptionWhereInput[] | StrokeSubscriptionWhereInput;
 }
 
-export interface ProfileCreateOneWithoutScoreCardsInput {
-  create?: ProfileCreateWithoutScoreCardsInput;
-  connect?: ProfileWhereUniqueInput;
-}
-
-export interface StrokeUpdateManyMutationInput {
-  golfer?: String;
-  strokes?: Int;
-}
-
-export interface ProfileCreateWithoutScoreCardsInput {
-  id?: ID_Input;
-  firstName: String;
-  lastName: String;
-  account: AccountCreateOneWithoutProfileInput;
-}
-
-export interface StrokeCreateInput {
-  id?: ID_Input;
-  hole: HoleCreateOneWithoutScoresInput;
-  golfer: String;
-  strokes: Int;
-}
-
-export interface AccountCreateOneWithoutProfileInput {
-  create?: AccountCreateWithoutProfileInput;
-  connect?: AccountWhereUniqueInput;
-}
-
-export interface ProfileCreateInput {
-  id?: ID_Input;
-  firstName: String;
-  lastName: String;
-  account: AccountCreateOneWithoutProfileInput;
-  scoreCards?: ScorecardCreateManyWithoutProfileInput;
-}
-
-export interface AccountCreateWithoutProfileInput {
-  id?: ID_Input;
-  email: String;
-  password: String;
-  role: Role;
-}
-
-export interface CourseCreateWithoutHolesInput {
-  id?: ID_Input;
-  scoreCard: ScorecardCreateOneWithoutCourseInput;
-  courseName: String;
-  courseAddress: String;
-  coursePhone: String;
-  long: Float;
-  lat: Float;
-  numberOfHoles: Int;
-}
-
-export interface CourseUpdateInput {
-  scoreCard?: ScorecardUpdateOneRequiredWithoutCourseInput;
-  courseName?: String;
-  courseAddress?: String;
-  coursePhone?: String;
-  long?: Float;
-  lat?: Float;
-  numberOfHoles?: Int;
-  holes?: HoleUpdateManyWithoutCourseInput;
-}
-
-export interface ScorecardCreategolfersInput {
-  set?: String[] | String;
-}
-
-export interface ScorecardUpdateOneRequiredWithoutCourseInput {
-  create?: ScorecardCreateWithoutCourseInput;
-  update?: ScorecardUpdateWithoutCourseDataInput;
-  upsert?: ScorecardUpsertWithoutCourseInput;
-  connect?: ScorecardWhereUniqueInput;
-}
-
-export interface ScorecardWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  createdAt?: DateTimeInput;
-  createdAt_not?: DateTimeInput;
-  createdAt_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
-  createdAt_lt?: DateTimeInput;
-  createdAt_lte?: DateTimeInput;
-  createdAt_gt?: DateTimeInput;
-  createdAt_gte?: DateTimeInput;
-  updatedAt?: DateTimeInput;
-  updatedAt_not?: DateTimeInput;
-  updatedAt_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
-  updatedAt_lt?: DateTimeInput;
-  updatedAt_lte?: DateTimeInput;
-  updatedAt_gt?: DateTimeInput;
-  updatedAt_gte?: DateTimeInput;
-  profile?: ProfileWhereInput;
-  course?: CourseWhereInput;
-  AND?: ScorecardWhereInput[] | ScorecardWhereInput;
-  OR?: ScorecardWhereInput[] | ScorecardWhereInput;
-  NOT?: ScorecardWhereInput[] | ScorecardWhereInput;
-}
-
-export interface ScorecardUpdateWithoutCourseDataInput {
-  profile?: ProfileUpdateOneRequiredWithoutScoreCardsInput;
-  golfers?: ScorecardUpdategolfersInput;
-}
-
-export interface ScorecardCreateInput {
-  id?: ID_Input;
-  profile: ProfileCreateOneWithoutScoreCardsInput;
-  golfers?: ScorecardCreategolfersInput;
-  course: CourseCreateOneWithoutScoreCardInput;
-}
-
-export interface AccountUpdateWithoutProfileDataInput {
-  email?: String;
-  password?: String;
-  role?: Role;
-}
-
-export interface AccountUpdateOneRequiredWithoutProfileInput {
-  create?: AccountCreateWithoutProfileInput;
-  update?: AccountUpdateWithoutProfileDataInput;
-  upsert?: AccountUpsertWithoutProfileInput;
-  connect?: AccountWhereUniqueInput;
-}
-
-export interface ProfileUpdateWithoutScoreCardsDataInput {
-  firstName?: String;
-  lastName?: String;
-  account?: AccountUpdateOneRequiredWithoutProfileInput;
-}
-
-export interface ProfileUpdateOneRequiredWithoutScoreCardsInput {
-  create?: ProfileCreateWithoutScoreCardsInput;
-  update?: ProfileUpdateWithoutScoreCardsDataInput;
-  upsert?: ProfileUpsertWithoutScoreCardsInput;
-  connect?: ProfileWhereUniqueInput;
-}
-
-export interface CourseUpdateWithoutHolesDataInput {
-  scoreCard?: ScorecardUpdateOneRequiredWithoutCourseInput;
-  courseName?: String;
-  courseAddress?: String;
-  coursePhone?: String;
-  long?: Float;
-  lat?: Float;
-  numberOfHoles?: Int;
-}
-
-export type CourseWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface HoleCreateWithoutCourseInput {
-  id?: ID_Input;
-  holeNum: Int;
-  handicap: Int;
-  par: Int;
-  distanceToFlag: Float;
-  blueTee: Int;
-  whiteTee: Int;
-  redTee: Int;
-  scores?: StrokeCreateManyWithoutHoleInput;
-}
-
-export interface ProfileCreateOneWithoutAccountInput {
-  create?: ProfileCreateWithoutAccountInput;
-  connect?: ProfileWhereUniqueInput;
+export interface CourseCreateOneWithoutScoreCardInput {
+  create?: CourseCreateWithoutScoreCardInput;
+  connect?: CourseWhereUniqueInput;
 }
 
 export interface NodeNode {
@@ -1677,7 +2010,8 @@ export interface StrokePreviousValues {
   id: ID_Output;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
-  golfer: String;
+  golferId?: ID_Output;
+  profileId?: ID_Output;
   strokes: Int;
 }
 
@@ -1687,7 +2021,8 @@ export interface StrokePreviousValuesPromise
   id: () => Promise<ID_Output>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
-  golfer: () => Promise<String>;
+  golferId: () => Promise<ID_Output>;
+  profileId: () => Promise<ID_Output>;
   strokes: () => Promise<Int>;
 }
 
@@ -1697,82 +2032,9 @@ export interface StrokePreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  golfer: () => Promise<AsyncIterator<String>>;
+  golferId: () => Promise<AsyncIterator<ID_Output>>;
+  profileId: () => Promise<AsyncIterator<ID_Output>>;
   strokes: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface CourseConnection {
-  pageInfo: PageInfo;
-  edges: CourseEdge[];
-}
-
-export interface CourseConnectionPromise
-  extends Promise<CourseConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CourseEdge>>() => T;
-  aggregate: <T = AggregateCoursePromise>() => T;
-}
-
-export interface CourseConnectionSubscription
-  extends Promise<AsyncIterator<CourseConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CourseEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCourseSubscription>() => T;
-}
-
-export interface ProfilePreviousValues {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  firstName: String;
-  lastName: String;
-}
-
-export interface ProfilePreviousValuesPromise
-  extends Promise<ProfilePreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  firstName: () => Promise<String>;
-  lastName: () => Promise<String>;
-}
-
-export interface ProfilePreviousValuesSubscription
-  extends Promise<AsyncIterator<ProfilePreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  firstName: () => Promise<AsyncIterator<String>>;
-  lastName: () => Promise<AsyncIterator<String>>;
-}
-
-export interface ScorecardPreviousValues {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  golfers: String[];
-}
-
-export interface ScorecardPreviousValuesPromise
-  extends Promise<ScorecardPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  golfers: () => Promise<String[]>;
-}
-
-export interface ScorecardPreviousValuesSubscription
-  extends Promise<AsyncIterator<ScorecardPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  golfers: () => Promise<AsyncIterator<String[]>>;
 }
 
 export interface AccountEdge {
@@ -1792,6 +2054,22 @@ export interface AccountEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
+export interface BatchPayload {
+  count: Long;
+}
+
+export interface BatchPayloadPromise
+  extends Promise<BatchPayload>,
+    Fragmentable {
+  count: () => Promise<Long>;
+}
+
+export interface BatchPayloadSubscription
+  extends Promise<AsyncIterator<BatchPayload>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Long>>;
+}
+
 export interface AggregateAccount {
   count: Int;
 }
@@ -1808,11 +2086,35 @@ export interface AggregateAccountSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface Golfer {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  name: String;
+}
+
+export interface GolferPromise extends Promise<Golfer>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  name: () => Promise<String>;
+  scoreCard: <T = ScorecardPromise>() => T;
+}
+
+export interface GolferSubscription
+  extends Promise<AsyncIterator<Golfer>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  name: () => Promise<AsyncIterator<String>>;
+  scoreCard: <T = ScorecardSubscription>() => T;
+}
+
 export interface Scorecard {
   id: ID_Output;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
-  golfers: String[];
 }
 
 export interface ScorecardPromise extends Promise<Scorecard>, Fragmentable {
@@ -1820,8 +2122,25 @@ export interface ScorecardPromise extends Promise<Scorecard>, Fragmentable {
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   profile: <T = ProfilePromise>() => T;
-  golfers: () => Promise<String[]>;
+  golfers: <T = FragmentableArray<Golfer>>(args?: {
+    where?: GolferWhereInput;
+    orderBy?: GolferOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
   course: <T = CoursePromise>() => T;
+  strokes: <T = FragmentableArray<Stroke>>(args?: {
+    where?: StrokeWhereInput;
+    orderBy?: StrokeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface ScorecardSubscription
@@ -1831,24 +2150,25 @@ export interface ScorecardSubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   profile: <T = ProfileSubscription>() => T;
-  golfers: () => Promise<AsyncIterator<String[]>>;
+  golfers: <T = Promise<AsyncIterator<GolferSubscription>>>(args?: {
+    where?: GolferWhereInput;
+    orderBy?: GolferOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
   course: <T = CourseSubscription>() => T;
-}
-
-export interface BatchPayload {
-  count: Long;
-}
-
-export interface BatchPayloadPromise
-  extends Promise<BatchPayload>,
-    Fragmentable {
-  count: () => Promise<Long>;
-}
-
-export interface BatchPayloadSubscription
-  extends Promise<AsyncIterator<BatchPayload>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Long>>;
+  strokes: <T = Promise<AsyncIterator<StrokeSubscription>>>(args?: {
+    where?: StrokeWhereInput;
+    orderBy?: StrokeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface StrokeEdge {
@@ -1868,29 +2188,26 @@ export interface StrokeEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface ScorecardSubscriptionPayload {
-  mutation: MutationType;
-  node: Scorecard;
-  updatedFields: String[];
-  previousValues: ScorecardPreviousValues;
+export interface ScorecardPreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface ScorecardSubscriptionPayloadPromise
-  extends Promise<ScorecardSubscriptionPayload>,
+export interface ScorecardPreviousValuesPromise
+  extends Promise<ScorecardPreviousValues>,
     Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = ScorecardPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = ScorecardPreviousValuesPromise>() => T;
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface ScorecardSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<ScorecardSubscriptionPayload>>,
+export interface ScorecardPreviousValuesSubscription
+  extends Promise<AsyncIterator<ScorecardPreviousValues>>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = ScorecardSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = ScorecardPreviousValuesSubscription>() => T;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface AggregateScorecard {
@@ -1991,62 +2308,29 @@ export interface ProfileEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface Course {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  courseName: String;
-  courseAddress: String;
-  coursePhone: String;
-  long: Float;
-  lat: Float;
-  numberOfHoles: Int;
+export interface ScorecardSubscriptionPayload {
+  mutation: MutationType;
+  node: Scorecard;
+  updatedFields: String[];
+  previousValues: ScorecardPreviousValues;
 }
 
-export interface CoursePromise extends Promise<Course>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  scoreCard: <T = ScorecardPromise>() => T;
-  courseName: () => Promise<String>;
-  courseAddress: () => Promise<String>;
-  coursePhone: () => Promise<String>;
-  long: () => Promise<Float>;
-  lat: () => Promise<Float>;
-  numberOfHoles: () => Promise<Int>;
-  holes: <T = FragmentableArray<Hole>>(args?: {
-    where?: HoleWhereInput;
-    orderBy?: HoleOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-}
-
-export interface CourseSubscription
-  extends Promise<AsyncIterator<Course>>,
+export interface ScorecardSubscriptionPayloadPromise
+  extends Promise<ScorecardSubscriptionPayload>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  scoreCard: <T = ScorecardSubscription>() => T;
-  courseName: () => Promise<AsyncIterator<String>>;
-  courseAddress: () => Promise<AsyncIterator<String>>;
-  coursePhone: () => Promise<AsyncIterator<String>>;
-  long: () => Promise<AsyncIterator<Float>>;
-  lat: () => Promise<AsyncIterator<Float>>;
-  numberOfHoles: () => Promise<AsyncIterator<Int>>;
-  holes: <T = Promise<AsyncIterator<HoleSubscription>>>(args?: {
-    where?: HoleWhereInput;
-    orderBy?: HoleOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
+  mutation: () => Promise<MutationType>;
+  node: <T = ScorecardPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = ScorecardPreviousValuesPromise>() => T;
+}
+
+export interface ScorecardSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<ScorecardSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = ScorecardSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = ScorecardPreviousValuesSubscription>() => T;
 }
 
 export interface Account {
@@ -2153,18 +2437,18 @@ export interface AccountPreviousValuesSubscription
   role: () => Promise<AsyncIterator<Role>>;
 }
 
-export interface AggregateCourse {
+export interface AggregateGolfer {
   count: Int;
 }
 
-export interface AggregateCoursePromise
-  extends Promise<AggregateCourse>,
+export interface AggregateGolferPromise
+  extends Promise<AggregateGolfer>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateCourseSubscription
-  extends Promise<AsyncIterator<AggregateCourse>>,
+export interface AggregateGolferSubscription
+  extends Promise<AsyncIterator<AggregateGolfer>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -2175,6 +2459,7 @@ export interface Profile {
   updatedAt: DateTimeOutput;
   firstName: String;
   lastName: String;
+  fullName: String;
 }
 
 export interface ProfilePromise extends Promise<Profile>, Fragmentable {
@@ -2183,6 +2468,7 @@ export interface ProfilePromise extends Promise<Profile>, Fragmentable {
   updatedAt: () => Promise<DateTimeOutput>;
   firstName: () => Promise<String>;
   lastName: () => Promise<String>;
+  fullName: () => Promise<String>;
   account: <T = AccountPromise>() => T;
   scoreCards: <T = FragmentableArray<Scorecard>>(args?: {
     where?: ScorecardWhereInput;
@@ -2203,6 +2489,7 @@ export interface ProfileSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   firstName: () => Promise<AsyncIterator<String>>;
   lastName: () => Promise<AsyncIterator<String>>;
+  fullName: () => Promise<AsyncIterator<String>>;
   account: <T = AccountSubscription>() => T;
   scoreCards: <T = Promise<AsyncIterator<ScorecardSubscription>>>(args?: {
     where?: ScorecardWhereInput;
@@ -2215,29 +2502,25 @@ export interface ProfileSubscription
   }) => T;
 }
 
-export interface StrokeSubscriptionPayload {
-  mutation: MutationType;
-  node: Stroke;
-  updatedFields: String[];
-  previousValues: StrokePreviousValues;
+export interface GolferConnection {
+  pageInfo: PageInfo;
+  edges: GolferEdge[];
 }
 
-export interface StrokeSubscriptionPayloadPromise
-  extends Promise<StrokeSubscriptionPayload>,
+export interface GolferConnectionPromise
+  extends Promise<GolferConnection>,
     Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = StrokePromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = StrokePreviousValuesPromise>() => T;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<GolferEdge>>() => T;
+  aggregate: <T = AggregateGolferPromise>() => T;
 }
 
-export interface StrokeSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<StrokeSubscriptionPayload>>,
+export interface GolferConnectionSubscription
+  extends Promise<AsyncIterator<GolferConnection>>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = StrokeSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = StrokePreviousValuesSubscription>() => T;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<GolferEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateGolferSubscription>() => T;
 }
 
 export interface CourseSubscriptionPayload {
@@ -2265,25 +2548,21 @@ export interface CourseSubscriptionPayloadSubscription
   previousValues: <T = CoursePreviousValuesSubscription>() => T;
 }
 
-export interface StrokeConnection {
-  pageInfo: PageInfo;
-  edges: StrokeEdge[];
+export interface CourseEdge {
+  node: Course;
+  cursor: String;
 }
 
-export interface StrokeConnectionPromise
-  extends Promise<StrokeConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<StrokeEdge>>() => T;
-  aggregate: <T = AggregateStrokePromise>() => T;
+export interface CourseEdgePromise extends Promise<CourseEdge>, Fragmentable {
+  node: <T = CoursePromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface StrokeConnectionSubscription
-  extends Promise<AsyncIterator<StrokeConnection>>,
+export interface CourseEdgeSubscription
+  extends Promise<AsyncIterator<CourseEdge>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<StrokeEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateStrokeSubscription>() => T;
+  node: <T = CourseSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface CoursePreviousValues {
@@ -2326,6 +2605,110 @@ export interface CoursePreviousValuesSubscription
   numberOfHoles: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface StrokeSubscriptionPayload {
+  mutation: MutationType;
+  node: Stroke;
+  updatedFields: String[];
+  previousValues: StrokePreviousValues;
+}
+
+export interface StrokeSubscriptionPayloadPromise
+  extends Promise<StrokeSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = StrokePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = StrokePreviousValuesPromise>() => T;
+}
+
+export interface StrokeSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<StrokeSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = StrokeSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = StrokePreviousValuesSubscription>() => T;
+}
+
+export interface Stroke {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  golferId?: ID_Output;
+  profileId?: ID_Output;
+  strokes: Int;
+}
+
+export interface StrokePromise extends Promise<Stroke>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  golferId: () => Promise<ID_Output>;
+  profileId: () => Promise<ID_Output>;
+  hole: <T = HolePromise>() => T;
+  scoreCard: <T = ScorecardPromise>() => T;
+  strokes: () => Promise<Int>;
+}
+
+export interface StrokeSubscription
+  extends Promise<AsyncIterator<Stroke>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  golferId: () => Promise<AsyncIterator<ID_Output>>;
+  profileId: () => Promise<AsyncIterator<ID_Output>>;
+  hole: <T = HoleSubscription>() => T;
+  scoreCard: <T = ScorecardSubscription>() => T;
+  strokes: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface StrokeConnection {
+  pageInfo: PageInfo;
+  edges: StrokeEdge[];
+}
+
+export interface StrokeConnectionPromise
+  extends Promise<StrokeConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<StrokeEdge>>() => T;
+  aggregate: <T = AggregateStrokePromise>() => T;
+}
+
+export interface StrokeConnectionSubscription
+  extends Promise<AsyncIterator<StrokeConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<StrokeEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateStrokeSubscription>() => T;
+}
+
+export interface GolferSubscriptionPayload {
+  mutation: MutationType;
+  node: Golfer;
+  updatedFields: String[];
+  previousValues: GolferPreviousValues;
+}
+
+export interface GolferSubscriptionPayloadPromise
+  extends Promise<GolferSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = GolferPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = GolferPreviousValuesPromise>() => T;
+}
+
+export interface GolferSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<GolferSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = GolferSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = GolferPreviousValuesSubscription>() => T;
+}
+
 export interface AggregateProfile {
   count: Int;
 }
@@ -2342,32 +2725,29 @@ export interface AggregateProfileSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface Stroke {
+export interface GolferPreviousValues {
   id: ID_Output;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
-  golfer: String;
-  strokes: Int;
+  name: String;
 }
 
-export interface StrokePromise extends Promise<Stroke>, Fragmentable {
+export interface GolferPreviousValuesPromise
+  extends Promise<GolferPreviousValues>,
+    Fragmentable {
   id: () => Promise<ID_Output>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
-  hole: <T = HolePromise>() => T;
-  golfer: () => Promise<String>;
-  strokes: () => Promise<Int>;
+  name: () => Promise<String>;
 }
 
-export interface StrokeSubscription
-  extends Promise<AsyncIterator<Stroke>>,
+export interface GolferPreviousValuesSubscription
+  extends Promise<AsyncIterator<GolferPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  hole: <T = HoleSubscription>() => T;
-  golfer: () => Promise<AsyncIterator<String>>;
-  strokes: () => Promise<AsyncIterator<Int>>;
+  name: () => Promise<AsyncIterator<String>>;
 }
 
 export interface AggregateHole {
@@ -2386,21 +2766,141 @@ export interface AggregateHoleSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface CourseEdge {
-  node: Course;
+export interface Hole {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  holeNum: Int;
+  handicap: Int;
+  par: Int;
+  distanceToFlag: Float;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
+}
+
+export interface HolePromise extends Promise<Hole>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  course: <T = CoursePromise>() => T;
+  holeNum: () => Promise<Int>;
+  handicap: () => Promise<Int>;
+  par: () => Promise<Int>;
+  distanceToFlag: () => Promise<Float>;
+  blueTee: () => Promise<Int>;
+  whiteTee: () => Promise<Int>;
+  redTee: () => Promise<Int>;
+}
+
+export interface HoleSubscription
+  extends Promise<AsyncIterator<Hole>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  course: <T = CourseSubscription>() => T;
+  holeNum: () => Promise<AsyncIterator<Int>>;
+  handicap: () => Promise<AsyncIterator<Int>>;
+  par: () => Promise<AsyncIterator<Int>>;
+  distanceToFlag: () => Promise<AsyncIterator<Float>>;
+  blueTee: () => Promise<AsyncIterator<Int>>;
+  whiteTee: () => Promise<AsyncIterator<Int>>;
+  redTee: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface GolferEdge {
+  node: Golfer;
   cursor: String;
 }
 
-export interface CourseEdgePromise extends Promise<CourseEdge>, Fragmentable {
-  node: <T = CoursePromise>() => T;
+export interface GolferEdgePromise extends Promise<GolferEdge>, Fragmentable {
+  node: <T = GolferPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface CourseEdgeSubscription
-  extends Promise<AsyncIterator<CourseEdge>>,
+export interface GolferEdgeSubscription
+  extends Promise<AsyncIterator<GolferEdge>>,
     Fragmentable {
-  node: <T = CourseSubscription>() => T;
+  node: <T = GolferSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface HoleSubscriptionPayload {
+  mutation: MutationType;
+  node: Hole;
+  updatedFields: String[];
+  previousValues: HolePreviousValues;
+}
+
+export interface HoleSubscriptionPayloadPromise
+  extends Promise<HoleSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = HolePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = HolePreviousValuesPromise>() => T;
+}
+
+export interface HoleSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<HoleSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = HoleSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = HolePreviousValuesSubscription>() => T;
+}
+
+export interface CourseConnection {
+  pageInfo: PageInfo;
+  edges: CourseEdge[];
+}
+
+export interface CourseConnectionPromise
+  extends Promise<CourseConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CourseEdge>>() => T;
+  aggregate: <T = AggregateCoursePromise>() => T;
+}
+
+export interface CourseConnectionSubscription
+  extends Promise<AsyncIterator<CourseConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CourseEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCourseSubscription>() => T;
+}
+
+export interface ProfilePreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  firstName: String;
+  lastName: String;
+  fullName: String;
+}
+
+export interface ProfilePreviousValuesPromise
+  extends Promise<ProfilePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  firstName: () => Promise<String>;
+  lastName: () => Promise<String>;
+  fullName: () => Promise<String>;
+}
+
+export interface ProfilePreviousValuesSubscription
+  extends Promise<AsyncIterator<ProfilePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  firstName: () => Promise<AsyncIterator<String>>;
+  lastName: () => Promise<AsyncIterator<String>>;
+  fullName: () => Promise<AsyncIterator<String>>;
 }
 
 export interface ProfileSubscriptionPayload {
@@ -2428,34 +2928,32 @@ export interface ProfileSubscriptionPayloadSubscription
   previousValues: <T = ProfilePreviousValuesSubscription>() => T;
 }
 
-export interface Hole {
+export interface Course {
   id: ID_Output;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
-  holeNum: Int;
-  handicap: Int;
-  par: Int;
-  distanceToFlag: Float;
-  blueTee: Int;
-  whiteTee: Int;
-  redTee: Int;
+  courseName: String;
+  courseAddress: String;
+  coursePhone: String;
+  long: Float;
+  lat: Float;
+  numberOfHoles: Int;
 }
 
-export interface HolePromise extends Promise<Hole>, Fragmentable {
+export interface CoursePromise extends Promise<Course>, Fragmentable {
   id: () => Promise<ID_Output>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
-  course: <T = CoursePromise>() => T;
-  holeNum: () => Promise<Int>;
-  handicap: () => Promise<Int>;
-  par: () => Promise<Int>;
-  distanceToFlag: () => Promise<Float>;
-  blueTee: () => Promise<Int>;
-  whiteTee: () => Promise<Int>;
-  redTee: () => Promise<Int>;
-  scores: <T = FragmentableArray<Stroke>>(args?: {
-    where?: StrokeWhereInput;
-    orderBy?: StrokeOrderByInput;
+  scoreCard: <T = ScorecardPromise>() => T;
+  courseName: () => Promise<String>;
+  courseAddress: () => Promise<String>;
+  coursePhone: () => Promise<String>;
+  long: () => Promise<Float>;
+  lat: () => Promise<Float>;
+  numberOfHoles: () => Promise<Int>;
+  holes: <T = FragmentableArray<Hole>>(args?: {
+    where?: HoleWhereInput;
+    orderBy?: HoleOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;
@@ -2464,23 +2962,22 @@ export interface HolePromise extends Promise<Hole>, Fragmentable {
   }) => T;
 }
 
-export interface HoleSubscription
-  extends Promise<AsyncIterator<Hole>>,
+export interface CourseSubscription
+  extends Promise<AsyncIterator<Course>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  course: <T = CourseSubscription>() => T;
-  holeNum: () => Promise<AsyncIterator<Int>>;
-  handicap: () => Promise<AsyncIterator<Int>>;
-  par: () => Promise<AsyncIterator<Int>>;
-  distanceToFlag: () => Promise<AsyncIterator<Float>>;
-  blueTee: () => Promise<AsyncIterator<Int>>;
-  whiteTee: () => Promise<AsyncIterator<Int>>;
-  redTee: () => Promise<AsyncIterator<Int>>;
-  scores: <T = Promise<AsyncIterator<StrokeSubscription>>>(args?: {
-    where?: StrokeWhereInput;
-    orderBy?: StrokeOrderByInput;
+  scoreCard: <T = ScorecardSubscription>() => T;
+  courseName: () => Promise<AsyncIterator<String>>;
+  courseAddress: () => Promise<AsyncIterator<String>>;
+  coursePhone: () => Promise<AsyncIterator<String>>;
+  long: () => Promise<AsyncIterator<Float>>;
+  lat: () => Promise<AsyncIterator<Float>>;
+  numberOfHoles: () => Promise<AsyncIterator<Int>>;
+  holes: <T = Promise<AsyncIterator<HoleSubscription>>>(args?: {
+    where?: HoleWhereInput;
+    orderBy?: HoleOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;
@@ -2497,9 +2994,9 @@ export interface HolePreviousValues {
   handicap: Int;
   par: Int;
   distanceToFlag: Float;
-  blueTee: Int;
-  whiteTee: Int;
-  redTee: Int;
+  blueTee?: Int;
+  whiteTee?: Int;
+  redTee?: Int;
 }
 
 export interface HolePreviousValuesPromise
@@ -2532,31 +3029,6 @@ export interface HolePreviousValuesSubscription
   redTee: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface HoleSubscriptionPayload {
-  mutation: MutationType;
-  node: Hole;
-  updatedFields: String[];
-  previousValues: HolePreviousValues;
-}
-
-export interface HoleSubscriptionPayloadPromise
-  extends Promise<HoleSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = HolePromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = HolePreviousValuesPromise>() => T;
-}
-
-export interface HoleSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<HoleSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = HoleSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = HolePreviousValuesSubscription>() => T;
-}
-
 export interface AggregateStroke {
   count: Int;
 }
@@ -2569,6 +3041,22 @@ export interface AggregateStrokePromise
 
 export interface AggregateStrokeSubscription
   extends Promise<AsyncIterator<AggregateStroke>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface AggregateCourse {
+  count: Int;
+}
+
+export interface AggregateCoursePromise
+  extends Promise<AggregateCourse>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateCourseSubscription
+  extends Promise<AsyncIterator<AggregateCourse>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -2635,22 +3123,19 @@ export interface ScorecardEdgeSubscription
 }
 
 /*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean;
+
+/*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
 */
 export type Int = number;
-
-export type Long = string;
 
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point). 
 */
 export type Float = number;
-
-/*
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
-*/
-export type ID_Input = string | number;
-export type ID_Output = string;
 
 /*
 DateTime scalar input type, allowing Date
@@ -2662,10 +3147,13 @@ DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
 
+export type Long = string;
+
 /*
-The `Boolean` scalar type represents `true` or `false`.
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
 */
-export type Boolean = boolean;
+export type ID_Input = string | number;
+export type ID_Output = string;
 
 /*
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
@@ -2699,6 +3187,10 @@ export const models: Model[] = [
   },
   {
     name: "Stroke",
+    embedded: false
+  },
+  {
+    name: "Golfer",
     embedded: false
   },
   {
