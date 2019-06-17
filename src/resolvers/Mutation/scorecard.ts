@@ -27,9 +27,9 @@ const ScoreCard = {
         }
       }
     });
-  },
+  }
 
-  async updateScorecard(_, { golfers: Golfer });
+  // async updateScorecard(_, { golfers: Golfer });
 };
 
 export default ScoreCard;
