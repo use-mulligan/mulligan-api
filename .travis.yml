@@ -20,12 +20,10 @@ env:
 beforeinstall:
   - npm install -g npm@^2
 install:
-  - npm install --only=dev
+  - npm install
 beforescript:
   - chmod 600 deploy && mv deploy ~/.ssh/idrsa
 script:
-  - npm run build
-after_success:
   - echo "Connecting to production server..."
   - ssh -tt deploy@138.197.128.14 << EOF
   - echo "Connected to production server."
@@ -38,5 +36,6 @@ after_success:
   - pm2 restart mulligan-api
   - exit $?
   - EOF
+after_success:
   - echo "Production server started successfully."
   - echo "Production environment deployed successfully!"
