@@ -6,13 +6,13 @@ import StrokeQueries from "./Query/Stroke";
 //Mutations
 import { Auth } from "./Mutation/Auth";
 import ScorecardMutations from "./Mutation/Scorecard";
-//import StrokeMutations from "./Mutation/stroke";
+import StrokeMutations from "./Mutation/Stroke";
 
 export default {
   Mutation: {
     ...Auth,
-    ...ScorecardMutations
-    //...StrokeMutations
+    ...ScorecardMutations,
+    ...StrokeMutations
   },
   Query: {
     ...AccountQueries,
