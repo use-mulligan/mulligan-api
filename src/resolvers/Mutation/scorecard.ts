@@ -9,8 +9,8 @@ interface Golfer {
  *
  *
  */
-const ScoreCard = {
-  async newScorecard(parent, { golfers, course }, ctx: Context) {
+const ScorecardMutations = {
+  newScorecard: async (parent, { golfers, course }, ctx: Context) => {
     const id = getAccountId(ctx);
     const profile = await ctx.prisma.account({ id }).profile();
 
@@ -32,4 +32,4 @@ const ScoreCard = {
   // async updateScorecard(_, { golfers: Golfer });
 };
 
-export default ScoreCard;
+export default ScorecardMutations;

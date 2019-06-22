@@ -21,8 +21,6 @@ beforeinstall:
   - npm install -g npm@^2
 install:
   - npm install
-beforescript:
-  - chmod 600 deploy && mv deploy ~/.ssh/idrsa
 script:
   - npm run build
 after_success:

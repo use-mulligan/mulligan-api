@@ -8,3 +8,4 @@ node_modules
 *.env*
 prisma/seed.graphql
 src/__tests__/mocks.ts
+src/generated/*
