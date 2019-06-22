@@ -1,12 +1,23 @@
 # Query - Mutation - Subscription
 
 type Query {
+  # Account
   me: Account!
   account(id: ID!): Account!
   accounts: [Account!]!
+
+  # Scorecard
+  scoreCard(id: ID): Scorecard!
+  scoreCards: [Scorecard!]!
+  myScorecards: [Scorecard!]!
+
+  # Stroke
+  stroke(id: ID!): Stroke!
+  strokes: [Stroke!]!
 }
 
 type Mutation {
+  # Auth/Account
   signup(
     email: String!
     password: String!
@@ -16,6 +27,12 @@ type Mutation {
   login(email: String!, password: String!): AuthPayload!
   createAccount(email: String!, password: String!, role: Role!): Account!
   deleteAccount(id: ID!): Account!
+
+  # Scorecard
+  newScorecard(golfers: [GolferInput]!, course: CourseInput!): Scorecard!
+
+  # Stroke
+  createStroke(golferId: ID, profileId: ID, holeId: ID!, strokes: Int!): Stroke!
 }
 
 # Types
@@ -27,8 +44,8 @@ type AuthPayload {
 
 type Account {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
   email: String!
   profile: Profile
   role: Role!
@@ -36,8 +53,8 @@ type Account {
 
 type Profile {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
   firstName: String!
   lastName: String!
   fullName: String!
@@ -47,9 +64,9 @@ type Profile {
 
 type Course {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  scoreCard: Scorecard!
+  createdAt: DateTime
+  updatedAt: DateTime
+  scoreCard: Scorecard
   courseName: String!
   courseAddress: String!
   coursePhone: String!
@@ -61,32 +78,32 @@ type Course {
 
 type Hole {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  course: Course!
+  createdAt: DateTime
+  updatedAt: DateTime
+  course: Course
   holeNum: Int!
   handicap: Int!
   par: Int!
   distanceToFlag: Float!
-  blueTee: Int!
-  whiteTee: Int!
-  redTee: Int!
-  scores: [Stroke]!
+  blueTee: Int
+  whiteTee: Int
+  redTee: Int
 }
 
 type Scorecard {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
   profile: Profile!
   golfers: [String!]!
   course: Course!
+  isActive: Boolean
 }
 
 type Stroke {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
   hole: Hole!
   golfer: String!
   strokes: Int!
@@ -94,10 +111,19 @@ type Stroke {
 
 type Golfer {
   id: ID!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: String
+  updatedAt: String
   name: String!
   scoreCard: Scorecard
+}
+
+input GolferInput {
+  name: String!
+  scoreCard: ID
+}
+
+input CourseInput {
+  courseId: ID
 }
 
 enum Role {
