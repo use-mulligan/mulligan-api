@@ -4,7 +4,7 @@ type Account {
   updatedAt: DateTime! @updatedAt
   email: String! @unique
   password: String!
-  profile: Profile! @relation(name: "UsersProfile", onDelete: CASCADE)
+  profile: Profile! @relation(name: "UsersProfile", link: INLINE, onDelete: CASCADE)
   role: Role!
 }
 
@@ -15,8 +15,8 @@ type Profile {
   firstName: String!
   lastName: String!
   fullName: String!
-  account: Account! @relation(name: "UsersProfile", link: INLINE)
   scoreCards: [Scorecard!]!
+  account: Account! @relation(name: "UsersProfile")
 }
 
 type Course {
@@ -55,6 +55,7 @@ type Scorecard {
   golfers: [Golfer!]!
   course: Course! @relation(link: INLINE)
   strokes: [Stroke]!
+  isActive: Boolean
 }
 
 type Stroke {

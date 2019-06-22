@@ -1,10 +1,10 @@
-version: '3'
+version: "3"
 services:
   mulligan-api:
     image: prismagraphql/prisma:1.34
     restart: always
     ports:
-    - "${PRISMA_PORT}:${PRISMA_PORT}"
+      - "${PRISMA_PORT}:${PRISMA_PORT}"
     environment:
       PRISMA_CONFIG: |
         port: ${PRISMA_PORT}
@@ -17,7 +17,7 @@ services:
             host: postgres
             user: ${PRISMA_USERNAME}
             password: ${PRISMA_PASSWORD}
-            rawAccess: true
+            rawAccess: false
             port: ${PSQL_PORT}
             migrations: true
   postgres:
