@@ -1,11 +1,12 @@
 import { getAccountId, Context } from "../../utils";
+import AccountFragment from "../Fragments/Account";
 
-export const Account = {
+const AccountQueries = {
   /**
    * Retrieves a account by their ID
    * @param id - the ID of the account
    */
-  account: async ({ id }, args, ctx: Context) => {
+  account: async (parent, { id }, ctx: Context) => {
     const userId = getAccountId(ctx);
 
     if (userId == null) {
@@ -13,12 +14,12 @@ export const Account = {
       // TODO: Wrap this in method somewhere - too much duplication
     }
 
-    return await ctx.prisma.account({ id }).profile();
+    return await ctx.prisma.account({ id }).$fragment(AccountFragment);
   },
   /**
    * Returns all accounts within the database
    */
-  accounts: async (parent, args, ctx: Context) => {
+  accounts: async (_, __, ctx: Context) => {
     const userId = getAccountId(ctx);
 
     if (userId == null) {
@@ -26,14 +27,14 @@ export const Account = {
       // TODO: Wrap this in method somewhere - too much duplication
     }
 
-    return await ctx.prisma.accounts();
+    return await ctx.prisma.accounts().$fragment(AccountFragment);
   },
 
   /**
    * Get the accounts own data
    * @param ctx -request context allows access to http headers
    */
-  me(ctx: Context) {
+  me: async (_, __, ctx: Context) => {
     const userId = getAccountId(ctx);
 
     if (userId == null) {
@@ -41,6 +42,8 @@ export const Account = {
       // TODO: Wrap this in method somewhere - too much duplication
     }
 
-    return ctx.prisma.account({ id: userId }).profile();
+    return await ctx.prisma.account({ id: userId }).$fragment(AccountFragment);
   }
 };
+
+export default AccountQueries;
