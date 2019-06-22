@@ -1,13 +1,22 @@
 // Queries
-import { Account } from "./Query/Account";
+import AccountQueries from "./Query/Account";
+import ScorecardQueries from "./Query/Scorecard";
+import StrokeQueries from "./Query/Stroke";
+
 //Mutations
-import { Auth } from "./Mutation/auth";
+import { Auth } from "./Mutation/Auth";
+import ScorecardMutations from "./Mutation/Scorecard";
+//import StrokeMutations from "./Mutation/stroke";
 
 export default {
   Mutation: {
-    ...Auth
+    ...Auth,
+    ...ScorecardMutations
+    //...StrokeMutations
   },
   Query: {
-    ...Account
+    ...AccountQueries,
+    ...ScorecardQueries,
+    ...StrokeQueries
   }
 };
