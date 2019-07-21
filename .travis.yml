@@ -22,7 +22,7 @@ after_success:
   - echo "Production server started successfully."
   - echo "Production environment deployed successfully!"
 before_install:
-  - openssl rsa -in deploy_key.enc -out ./deploy_key -d
+  - openssl rsa -in deploy_key.enc -out ./deploy_key
   - eval "$(ssh-agent -s)"
   - chmod 600 deploy_key
   - echo -e "Host 165.22.235.117\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
