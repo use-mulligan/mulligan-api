@@ -21,27 +21,25 @@ beforeinstall:
   - yarn install -g pm2
 install:
   - yarn install
-deploy:
-  provider:
-  script skip_cleanup: true
-  script:
-    - git config --global push.default matching
-    - git remote add deploy ssh://git@165.22.235.117:8081/
-    - git push deploy master
-    - pm2 restart mulligan-api
-  on:
-    branch: master
-# script:
-#   # - ssh -tt root@165.22.235.117
-#   # - echo "Y"
-#   - echo "Connected to production server."
-#   - cd mulligan-api
-#   - echo "Updating application..."
-#   - git pull origin master
-#   # - npm install
-#   - echo "Application updated."
-#   - echo "Launching production server..."
-#   - pm2 restart mulligan-api
-# after_success:
-#   - echo "Production server started successfully."
-#   - echo "Production environment deployed successfully!"
+# deploy:
+#   provider:
+#   script skip_cleanup: true
+#   script:
+#     - git config --global push.default matching
+#     - git remote add deploy ssh://git@165.22.235.117:8081/
+#     - git push deploy master
+#     - pm2 restart mulligan-api
+#   on:
+#     branch: master
+script:
+  - ssh -tt root@165.22.235.117
+  - echo "Connected to production server."
+  - cd mulligan-api
+  - echo "Updating application..."
+  - git pull origin master
+  - echo "Application updated."
+  - echo "Launching production server..."
+  - pm2 restart mulligan-api
+after_success:
+  - echo "Production server started successfully."
+  - echo "Production environment deployed successfully!"
