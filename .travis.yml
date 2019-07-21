@@ -27,8 +27,7 @@ after_success:
   - echo "Production server started successfully."
   - echo "Production environment deployed successfully!"
 before_install:
-  - openssl aes-256-cbc -K $encrypted_582c48595f3f_key -iv $encrypted_582c48595f3f_iv
-    -in deploy_key.enc -out ./deploy_key -d
+  - openssl aes-256-cbc -K $encrypted_582c48595f3f_key -iv $encrypted_582c48595f3f_iv -in deploy_key.enc -out ./deploy_key -d
   - eval "$(ssh-agent -s)"
   - chmod 600 ./deploy_key
   - echo -e "Host 157.230.183.190\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
