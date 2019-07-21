@@ -7,21 +7,32 @@ notifications:
     onsuccess: change
 addons:
   sshknownhosts:
+<<<<<<< HEAD
   - 138.197.128.14
+=======
+    - 165.22.235.117 # your droplet IP goes here
+>>>>>>> 6f8fc0853a5c106623d6b9086f01c236b5dedd55
 branches:
   only:
   - staging
   - master
 env:
   global:
+<<<<<<< HEAD
   - REMOTEAPPDIR=mulligan/mulligan-api
   - REMOTEUSER=deploy
   - REMOTEHOST=138.197.128.14
+=======
+    - REMOTEAPPDIR=/mulligan-api
+    - REMOTEUSER=deploy
+    - REMOTEHOST=165.22.235.117 # your droplet IP goes here
+>>>>>>> 6f8fc0853a5c106623d6b9086f01c236b5dedd55
 beforeinstall:
 - npm install -g npm@^2
 install:
 - npm install
 script:
+<<<<<<< HEAD
 - npm run build
 after_success:
 - ssh -tt deploy@138.197.128.14 << EOF
@@ -40,3 +51,17 @@ after_success:
 before_install:
 - openssl aes-256-cbc -K $encrypted_096bdc69318e_key -iv $encrypted_096bdc69318e_iv
   -in deploy_rsa.enc -out deploy_rsa -d
+=======
+  - ssh -tt deploy@165.22.235.117
+  - echo "Connected to production server."
+  - cd mulligan-api
+  - echo "Updating application..."
+  - git pull origin master
+  - npm install
+  - echo "Application updated."
+  - echo "Launching production server..."
+  - pm2 restart mulligan-api
+after_success:
+  - echo "Production server started successfully."
+  - echo "Production environment deployed successfully!"
+>>>>>>> 6f8fc0853a5c106623d6b9086f01c236b5dedd55

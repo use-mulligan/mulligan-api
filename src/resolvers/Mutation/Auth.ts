@@ -2,6 +2,8 @@ import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
 import { Context, getAccountId } from "../../utils";
 import { UniqueConstraintViolationError } from "../../errorhandling/customerrors";
+import AccountFragment from "../Fragments/Account";
+import { Account } from "../../generated/prisma-client";
 
 export const Auth = {
   /**
@@ -25,7 +27,7 @@ export const Auth = {
 
       // hash the password and create the account
       password = await bcrypt.hash(password, 10);
-      const account = await ctx.prisma
+      const account = (await ctx.prisma
         .createAccount({
           email: email,
           password: password,
@@ -38,7 +40,8 @@ export const Auth = {
             }
           }
         })
-        .profile();
+        .profile()
+        .$fragment(AccountFragment)) as Account;
 
       return {
         token: jwt.sign({ accountId: account.id }, process.env.APP_SECRET),
@@ -61,7 +64,9 @@ export const Auth = {
   async login(_, { email, password }, ctx: Context) {
     try {
       // make sure the account exists first
-      const account = await ctx.prisma.account({ email: email });
+      const account = (await ctx.prisma
+        .account({ email: email })
+        .$fragment(AccountFragment)) as Account;
       if (!account) {
         throw new Error(
           `Cannot find account associated with the email: ${email}`
@@ -95,7 +100,7 @@ export const Auth = {
     try {
       const accountId = getAccountId(ctx); // authenticate
 
-      const account = await ctx.prisma.account({ id: accountId });
+      const account = (await ctx.prisma.account({ id: accountId })) as Account;
       if (account.role != "ADMIN") {
         // authorize
         // TODO: log this attempt
