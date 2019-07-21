@@ -9,3 +9,4 @@ node_modules
 prisma/seed.graphql
 src/__tests__/mocks.ts
 src/generated/*
+deploy_key
