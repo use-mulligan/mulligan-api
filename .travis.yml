@@ -26,5 +26,5 @@ before_install:
     -in deploy_key.enc -out deploy_key -d
   - eval "$(ssh-agent -s)"
   - chmod 600 deploy_key
-  - echo -e "Host 157.230.183.190\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - echo -e "Host 165.22.235.117\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - ssh-add deploy_key
