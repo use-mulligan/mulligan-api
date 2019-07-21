@@ -18,24 +18,9 @@ env:
     - REMOTEUSER=deploy
     - REMOTEHOST=165.22.235.117 # your droplet IP goes here
 beforeinstall:
-  - npm install -g npm@^2
+  - yarn install -g pm2
 install:
-  - npm install
-script:
-  # - ssh -tt root@165.22.235.117
-  # - echo "Y"
-  - echo "Connected to production server."
-  - cd mulligan-api
-  - echo "Updating application..."
-  - git pull origin master
-  # - npm install
-  - echo "Application updated."
-  - echo "Launching production server..."
-  - pm2 restart mulligan-api
-after_success:
-  - echo "Production server started successfully."
-  - echo "Production environment deployed successfully!"
-
+  - yarn install
 deploy:
   provider:
   script skip_cleanup: true
@@ -46,3 +31,17 @@ deploy:
     - pm2 restart mulligan-api
   on:
     branch: master
+# script:
+#   # - ssh -tt root@165.22.235.117
+#   # - echo "Y"
+#   - echo "Connected to production server."
+#   - cd mulligan-api
+#   - echo "Updating application..."
+#   - git pull origin master
+#   # - npm install
+#   - echo "Application updated."
+#   - echo "Launching production server..."
+#   - pm2 restart mulligan-api
+# after_success:
+#   - echo "Production server started successfully."
+#   - echo "Production environment deployed successfully!"
