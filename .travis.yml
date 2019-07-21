@@ -22,7 +22,6 @@ beforeinstall:
 install:
   - npm install
 script:
-  - ssh -tt root@165.22.235.117
   - echo "Y"
   - echo "Connected to production server."
   - cd mulligan-api
