@@ -22,9 +22,7 @@ beforeinstall:
 install:
   - npm install
 script:
-  - npm run build
-after_success:
-  - ssh -tt deploy@165.22.235.117 << EOF
+  - ssh -tt deploy@165.22.235.117
   - echo "Connected to production server."
   - cd mulligan-api
   - echo "Updating application..."
@@ -33,7 +31,6 @@ after_success:
   - echo "Application updated."
   - echo "Launching production server..."
   - pm2 restart mulligan-api
-  - exit $?
-  - EOF
+after_success:
   - echo "Production server started successfully."
   - echo "Production environment deployed successfully!"
