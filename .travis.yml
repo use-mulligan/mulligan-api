@@ -1,26 +1,31 @@
 language: nodeCreate public and private SSH keysjs
 nodejs:
-- 6.9.1
+  - 6.9.1
 notifications:
   email:
     onfailure: change
     onsuccess: change
 addons:
   sshknownhosts:
-  - 165.22.235.117
+    - 165.22.235.117
 branches:
   only:
-  - staging
-  - master
+    - staging
+    - master
 install:
-- yarn install
+  - yarn install
 script:
-- echo "Starting Deployment...."
+  - echo "Starting Deployment...."
 after_script:
-- cd /mulligan-api && git pull origin master
+  - cd /mulligan-api && git pull origin master
 after_success:
-- echo "Production server started successfully."
-- echo "Production environment deployed successfully!"
+  - echo "Production server started successfully."
+  - echo "Production environment deployed successfully!"
 before_install:
-- openssl aes-256-cbc -K $encrypted_191715981665_key -iv $encrypted_191715981665_iv
-  -in deploy_key.enc -out ./deploy_key -d
+  - openssl aes-256-cbc -K $encrypted_191715981665_key -iv $encrypted_191715981665_iv
+    -in deploy_key.enc -out ./deploy_key -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 ./deploy_key
+  - echo -e "Host 165.22.235.117\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - ssh-add ./deploy_key
+  - ssh -i ./deploy_key root@165.22.235.117 pwd
