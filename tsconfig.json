@@ -6,11 +6,7 @@
     "sourceMap": true,
     "rootDir": "src",
     "outDir": "dist",
-    "lib": [
-      "esnext", "dom", "es6"
-    ],
-    "types": [
-      "node", "jest", "bcryptjs"
-    ]
+    "lib": ["esnext", "dom", "es6"],
+    "types": ["node", "jest", "bcryptjs", "graphql"]
   }
 }
