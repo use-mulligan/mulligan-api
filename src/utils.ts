@@ -1,11 +1,6 @@
 import * as jwt from "jsonwebtoken";
-import { Prisma } from "./generated/prisma-client";
 import { AuthError } from "./errorhandling/customerrors";
-
-export interface Context {
-  prisma: Prisma;
-  request: any;
-}
+import { Context } from "./types";
 
 export function getAccountId(ctx: Context) {
   const Authorization = ctx.request.get("Authorization");
