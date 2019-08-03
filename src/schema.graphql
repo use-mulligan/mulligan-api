@@ -10,10 +10,20 @@ type Query {
   scoreCard(id: ID): Scorecard!
   scoreCards: [Scorecard!]!
   myScorecards: [Scorecard!]!
+  getProfileScorecards(profileId: ID!): [Scorecard!]!
 
   # Stroke
   stroke(id: ID!): Stroke!
   strokes: [Stroke!]!
+
+  # Profile
+  myProfile: Profile!
+  profiles: [Profile!]!
+  profileById(profileId: ID!): Profile!
+
+  # Course
+  course(courseId: ID!): Course!
+  courses: [Course!]!
 }
 
 type Mutation {

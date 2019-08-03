@@ -71,6 +71,7 @@ type Stroke {
 
 type Golfer {
   id: ID! @id
+  accountId: ID
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
   name: String!
