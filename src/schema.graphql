@@ -105,7 +105,7 @@ type Scorecard {
   createdAt: DateTime
   updatedAt: DateTime
   profile: Profile!
-  golfers: [String!]!
+  golfers: [Golfer!]!
   course: Course!
   isActive: Boolean
 }
@@ -124,7 +124,6 @@ type Golfer {
   createdAt: String
   updatedAt: String
   name: String!
-  scoreCard: Scorecard
 }
 
 input GolferInput {
