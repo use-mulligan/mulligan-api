@@ -7,6 +7,7 @@ import StrokeQueries from "./Query/Stroke";
 import { Auth } from "./Mutation/Auth";
 import ScorecardMutations from "./Mutation/Scorecard";
 import StrokeMutations from "./Mutation/Stroke";
+import { ProfileQueries } from "./Query/Profile";
 
 export default {
   Mutation: {
@@ -17,6 +18,7 @@ export default {
   Query: {
     ...AccountQueries,
     ...ScorecardQueries,
-    ...StrokeQueries
+    ...StrokeQueries,
+    ...ProfileQueries
   }
 };
