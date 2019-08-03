@@ -1,9 +1,13 @@
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
-import { Context, getAccountId } from "../../utils";
-import { UniqueConstraintViolationError } from "../../errorhandling/customerrors";
+import { getAccountId } from "../../utils";
+import {
+  UniqueConstraintViolationError,
+  MutationFailedError
+} from "../../errorhandling/customerrors";
 import AccountFragment from "../Fragments/Account";
 import { Account } from "../../generated/prisma-client";
+import { Context } from "../../types";
 
 export const Auth = {
   /**
@@ -15,7 +19,7 @@ export const Auth = {
    * @param accountname => type: String
    * @param ctx - request context allows access to http headers
    */
-  async signup(_, { email, password, firstName, lastName }, ctx: Context) {
+  async signup(_: any, { email, password, firstName, lastName }, ctx: Context) {
     try {
       // make sure account doesn't exist before attempting
       // to create a new account
@@ -47,8 +51,8 @@ export const Auth = {
         token: jwt.sign({ accountId: account.id }, process.env.APP_SECRET),
         account
       };
-    } catch (err) {
-      throw err;
+    } catch (ex) {
+      throw new MutationFailedError(ex);
     }
   },
 
@@ -61,7 +65,7 @@ export const Auth = {
    * @param password => String
    * @param ctx - request context allows access to http headers
    */
-  async login(_, { email, password }, ctx: Context) {
+  async login(_: any, { email, password }, ctx: Context) {
     try {
       // make sure the account exists first
       const account = (await ctx.prisma
@@ -85,8 +89,8 @@ export const Auth = {
         token: jwt.sign({ accountId: account.id }, process.env.APP_SECRET),
         account
       };
-    } catch (err) {
-      throw err;
+    } catch (ex) {
+      throw new MutationFailedError(ex);
     }
   },
   /**
@@ -96,7 +100,7 @@ export const Auth = {
    * @param id - the ID of the account to be deleted
    * @param ctx - request context allows access to http headers
    */
-  async deleteAccount(_, { id }, ctx: Context) {
+  async deleteAccount(_: any, { id }, ctx: Context) {
     try {
       const accountId = getAccountId(ctx); // authenticate
 
@@ -115,9 +119,9 @@ export const Auth = {
       }
 
       return await ctx.prisma.deleteAccount({ id });
-    } catch (err) {
+    } catch (ex) {
       // TODO: log error
-      throw err;
+      throw new MutationFailedError(ex);
     }
   }
 };
