@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import { GraphQLServer } from "graphql-yoga";
 import { prisma } from "./generated/prisma-client";
 import ora from "ora";
