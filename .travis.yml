@@ -15,7 +15,7 @@ branches:
 install:
   - yarn install
 script:
-  - echo "Starting Deployment..."
+  - echo "Starting Deployment...."
 after_script:
   - ssh -i deploy_key root@165.22.235.117 cd /mulligan-api && git pull origin master
 after_success:
